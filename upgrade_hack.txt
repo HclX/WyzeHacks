@@ -1,0 +1,3 @@
+The device support SD card based firmware update. Using the script in "upgrade_hack", you can generate an upgrade file to run any command you want. In this example, we have the a pre-geneated updating script which simply runs telnetd and waiting forever so you can log into it.
+
+To use this, copy the FIRMWARE_660R.bin and version.ini onto SD card, insert the card into the camera and wait for a couple seconds. You should have telnetd running on the camera now.
