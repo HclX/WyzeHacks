@@ -1,5 +1,5 @@
 #!/bin/sh
-tar -cvf ./FIRMWARE_660R.bin ./Upgrade
+tar -cvf ./FIRMWARE_660R.bin -C ./app Upgrade
 md5=$(md5sum ./FIRMWARE_660R.bin)
 set -- junk $md5
 shift
