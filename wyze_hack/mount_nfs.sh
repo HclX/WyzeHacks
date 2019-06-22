@@ -1,6 +1,9 @@
 #!/bin/sh
-SCRIPT_DIR=`dirname $0`
+
+# Default configuration
 NFS_ROOT="192.168.1.200:/volume1"
+
+# User configuration
 source $SCRIPT_DIR/config.inc
 
 # Do not modify the rest of this script unless you know what you are doing.
@@ -22,8 +25,14 @@ do
 
     if mount | grep -q "/dev/mmcblk0p1 on /media/mmcblk0p1";
     then
-        echo "SD card mounted, unmounting..."
-
+        echo "SD card mounted"
+        if [ -f /media/mmcblk0p1/version.ini ];
+        then
+            echo "Stopping NFS mount..."
+            exit
+        fi
+        
+        echo "Unmounting SD card..."
         # Delay umount to avoid racing
         sleep 10
         if ! umount /media/mmcblk0p1;
