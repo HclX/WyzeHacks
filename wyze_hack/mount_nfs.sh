@@ -1,4 +1,6 @@
 #!/bin/sh
+SCRIPT_DIR=`readlink -f $0`
+SCRIPT_DIR=`dirname $SCRIPT_DIR`
 
 # Default configuration
 NFS_ROOT="192.168.1.200:/volume1"
@@ -7,13 +9,11 @@ NFS_ROOT="192.168.1.200:/volume1"
 source $SCRIPT_DIR/config.inc
 
 # Do not modify the rest of this script unless you know what you are doing.
-NFS_MOUNT="mount -o nolock,rw"
+NFS_MOUNT="/bin/mount -o nolock,rw"
 
-mkdir -p /tmp/www
-
-sleep 60
 while true
 do
+    sleep 10
     MAC=`sed 's/://g' /sys/class/net/wlan0/address | tr a-z A-Z`
 
     if [ "${#MAC}" -ne "12" ];
@@ -22,57 +22,17 @@ do
         continue
     fi
 
-    if mount | grep -q "/dev/mmcblk0p1 on /media/mmcblk0p1";
-    then
-        echo "SD card mounted"
-        if [ -f /media/mmcblk0p1/version.ini ];
-        then
-            echo "Stopping NFS mount..."
-            exit
-        fi
-        
-        sleep 5
-        echo "Unmounting SD card..."
-        if ! umount /media/mmcblk0p1;
-        then
-            echo "umount /media/mmcblk0p1 failed, will retry..."
-            continue
-        fi
-    fi
-
-    if [ ! -d /media/mmcblk0p1 ];
-    then
-        echo "/media/mmcblk0p1 doesn't exist, creating..."
-        if ! mkdir -p /media/mmcblk0p1;
-        then
-            echo "mkdir -p /media/mmcblk0p1 failed, will retry..."
-            continue
-        fi
-    fi
-
-    LOGSIZE=`wc /tmp/boot0.log -c| awk '{print $1}'`
-    if [ "$LOGSIZE" -gt "1000000" ];
-    then
-        cp /tmp/boot0.log /tmp/boot1.log
-        echo "Log truncated" > /tmp/boot0.log
-    fi
-
     CAM_DIR=WyzeCams/$MAC
-    if mount | grep -q "$NFS_ROOT/$CAM_DIR on /media/mmcblk0p1";
+    if /bin/mount | grep -q "$NFS_ROOT/$CAM_DIR";
     then
-        echo "NFS share already mounted..."
-        if [ ! -L /tmp/www/SDPath ];
-        then
-            mkdir -p /tmp/www
-            ln -s /media/mmcblk0p1 /tmp/www/SDPath
-        fi
-        sleep 10
+        echo "NFS already mounted..."
+        sleep 60
         continue
     fi
 
-    if ! mount | grep -q "$NFS_ROOT on /mnt";
+    if ! /bin/mount | grep -q "$NFS_ROOT on /mnt";
     then
-        echo "Mounting $NFS_ROOT on /mnt..."
+        echo "$NFS_ROOT not mounted, try mounting to /mnt..."
         if ! $NFS_MOUNT $NFS_ROOT /mnt;
         then
             echo "[$NFS_MOUNT $NFS_ROOT /mnt] failed, will retry..."
@@ -88,16 +48,20 @@ do
             echo "[mkdir -p /mnt/$CAM_DIR] failed, will retry..."
             continue
         fi
-
-        mkdir -p /mnt/$CAM_DIR/record
-        mkdir -p /mnt/$CAM_DIR/time_lapse
-        mkdir -p /mnt/$CAM_DIR/photo
     fi
 
     echo "Mounting camera directory $NFS_ROOT/$CAM_DIR on /media/mmcblk0p1"
+    mkdir -p /media/mmcblk0p1
     if ! $NFS_MOUNT $NFS_ROOT/$CAM_DIR /media/mmcblk0p1;
     then
         echo "mount mount $NFS_ROOT/$CAM_DIR /media/mmcblk0p1 failed, will retry..."
         continue
     fi
+
+    ifconfig > /media/mmcblk0p1/ifconfig.txt 2>&1
+
+    echo "Notifying iCamera about SD card insertion event..."
+    touch /dev/mmcblk0
+    touch /dev/mmcblk0p1
+    $SCRIPT_DIR/uevent_send "add@/devices/platform/jzmmc_v1.2.0/mmc_host/mmc0/mmc0:e624/block/mmcblk0/mmcblk0p1"
 done
