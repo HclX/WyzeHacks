@@ -7,6 +7,9 @@
 export NFS_ROOT='192.168.1.10:/volume1/'
 
 # !!!ADVANCED USER!!!
-# This changes the default root password to whatever you specified. You
-# need to know how to generate the hash from your plain text password.
-# export PASSWD_SHADOW='root:rJ0FHsG0ZbyZo:10933:0:99999:7:::'
+# This changes the default root password to whatever you specified. To
+# generate your own password hash, use the following command from a
+# linux environment:
+#   openssl passwd -1 -salt <YOUR SALT> <YOUR PASSWORD>
+# Use the result to replace sample hash ($1$MYSALT$3Sy1OLRk4kTa7P6fvzwp71)
+# export PASSWD_SHADOW='root:$1$MYSALT$3Sy1OLRk4kTa7P6fvzwp71:10933:0:99999:7:::'
