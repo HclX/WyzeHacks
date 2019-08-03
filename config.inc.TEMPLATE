@@ -1,5 +1,12 @@
+# USER CONFIGURATIONS -- TO BE MODIFIED BY USER
+# Make your own copy of this file and put it under the root of SD card
+# with name "config.inc" when installing the hack.
+
 # You need to modify NFS_ROOT to point to your NFS share. The recordings
 # will be stored under $NFS_ROOT/WyzeCams/<MAC_ADDR_OF_YOUR_CAMERA>/
+export NFS_ROOT='192.168.1.10:/volume1/'
 
-NFS_ROOT="192.168.1.200:/volume1"
-
+# !!!ADVANCED USER!!!
+# This changes the default root password to whatever you specified. You
+# need to know how to generate the hash from your plain text password.
+# export PASSWD_SHADOW='root:rJ0FHsG0ZbyZo:10933:0:99999:7:::'

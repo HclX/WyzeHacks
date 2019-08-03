@@ -21,6 +21,6 @@ do
         continue
     fi
 
-    mkdir -p /media/mmcblk0p1/logs
-    cp /tmp/boot1.log /media/mmcblk0p1/logs/boot_`date +"%Y_%m_%d_%H_%M_%S"`.log
+    mkdir -p /media/mmcblk0p1/log
+    cp /tmp/boot1.log /media/mmcblk0p1/log/boot_`date +"%Y_%m_%d_%H_%M_%S"`.log
 done

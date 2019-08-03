@@ -4,7 +4,6 @@ SCRIPT_DIR=`dirname $SCRIPT_DIR`
 
 # Enable telnetd
 echo 1>/configs/.Server_config
-telnetd
 
 APP_VER=`grep -o "AppVer=.*$" /system/bin/app.ver | sed 's/AppVer=\(.*\)$/\1/g'`
 if [ ! -f $SCRIPT_DIR/$APP_VER/app_init.sh ];

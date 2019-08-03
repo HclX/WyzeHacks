@@ -2,11 +2,11 @@
 SCRIPT_DIR=`readlink -f $0`
 SCRIPT_DIR=`dirname $SCRIPT_DIR`
 
-# Default configuration
-NFS_ROOT="192.168.1.200:/volume1"
-
-# User configuration
-source $SCRIPT_DIR/config.inc
+if [ -z "$NFS_ROOT" ];
+then
+    echo "NFS_ROOT not configured, skipping NFS mount..."
+    exit 1
+fi
 
 # Do not modify the rest of this script unless you know what you are doing.
 NFS_MOUNT="/bin/mount -o nolock,rw"
