@@ -6,6 +6,11 @@
 # will be stored under $NFS_ROOT/WyzeCams/<MAC_ADDR_OF_YOUR_CAMERA>/
 export NFS_ROOT='192.168.1.10:/volume1/'
 
+# Uncomment and modify the AUTO_REBOOT variable to automatically reboot
+# the camera at a specific minute. Time is specified in "HH:MM" format
+# in UTC time.
+# export REBOOT_AT='13:16'
+
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
 # generate your own password hash, use the following command from a

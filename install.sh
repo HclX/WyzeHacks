@@ -8,6 +8,9 @@ exec 2>&1
 SCRIPT_DIR=`readlink -f $0`
 SCRIPT_DIR=`dirname $SCRIPT_DIR`
 
+source $SCRIPT_DIR/wyze_hack/ver.inc
+echo "Installing WyzeHacks version $SCRIPT_VER"
+
 # Clear update files to avoid update loop
 rm /media/mmcblk0p1/version.ini.old
 mv /media/mmcblk0p1/version.ini /media/mmcblk0p1/version.ini.old
@@ -17,6 +20,7 @@ cp -rL /system /media/mmcblk0p1/debug
 cp -rL /etc /media/mmcblk0p1/debug
 
 # Copying wyze_hack scripts
+rm -rf /system/wyze_hack
 cp -r $SCRIPT_DIR/wyze_hack /system/
 
 # Updating user config if exists
@@ -39,7 +43,7 @@ $SCRIPT_DIR/wyze_hack/bind_etc.sh
 /system/wyze_hack/install.sh
 
 # Debugging ...
-if [ -f /media/mmcblk0p1/no_reboot ];
+if [ -f /media/mmcblk0p1/.noreboot ];
 then
     while true
     do
