@@ -11,6 +11,15 @@ export NFS_ROOT='192.168.1.10:/volume1/'
 # in UTC time.
 # export REBOOT_AT='13:16'
 
+# Uncomment and modify the ARCHIVE_OLDER_THAN variable to automatically
+# archive recording clips and alarm images if it's a certain days older.
+# export ARCHIVE_OLDER_THAN=5
+
+# Uncomment the following variable to sync the console log to the camera
+# folder in NFS share. Use with caution as the log contains sensitive
+# information and will cause your account compromise if leaked.
+# export SYNC_BOOT_LOG=1
+
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
 # generate your own password hash, use the following command from a

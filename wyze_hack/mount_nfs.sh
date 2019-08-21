@@ -74,3 +74,5 @@ done
 
 $SCRIPT_DIR/log_sync.sh &
 $SCRIPT_DIR/auto_reboot.sh &
+$SCRIPT_DIR/auto_archive.sh &
+
