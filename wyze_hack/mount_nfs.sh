@@ -8,17 +8,21 @@ then
     exit 1
 fi
 
-# Do not modify the rest of this script unless you know what you are doing.
 NFS_MOUNT="/bin/mount -o nolock,rw"
+
+DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g'`
+if [ -z "$DEVICE_ID" ];
+then
+    echo "Device ID not found in /params/config/.product_config!"
+    exit 1
+fi
 
 while true
 do
     sleep 10
-    MAC=`sed 's/://g' /sys/class/net/wlan0/address | tr a-z A-Z`
-
-    if [ "${#MAC}" -ne "12" ];
+    if ! ifconfig wlan0 | grep "inet addr";
     then
-        echo "Unexpected MAC address:[$MAC], will retry..."
+        echo "wlan0 not ready yet..."
         continue
     fi
 
@@ -32,10 +36,10 @@ do
         fi
     fi
 
-    CAM_DIR=/mnt/WyzeCams/$MAC
+    CAM_DIR=/mnt/WyzeCams/$DEVICE_ID
     for DIR in /mnt/WyzeCams/*/;
     do
-        if [ -f $DIR/.mac_$MAC ];
+        if [ -f $DIR/.mac_$DEVICE_ID ];
         then
             CAM_DIR=$DIR
             break
@@ -61,7 +65,7 @@ do
         continue
     fi
 
-    touch /media/mmcblk0p1/.mac_$MAC
+    touch /media/mmcblk0p1/.mac_$DEVICE_ID
     ifconfig > /media/mmcblk0p1/ifconfig.txt 2>&1
 
     echo "Notifying iCamera about SD card insertion event..."
