@@ -1,0 +1,6 @@
+#!/bin/sh
+echo "Camera is rebooting in 10 seconds ..."
+/system/wyze_hack/hookup.sh
+
+sleep 10
+/sbin/reboot $@

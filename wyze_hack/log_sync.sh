@@ -8,6 +8,21 @@ then
     exit 0
 fi
 
+# Wait until the NTP client updated local time, so we can have correct log timestamp
+touch /media/mmcblk0p1/.timestamp
+while true
+do
+    sleep 5
+    touch /tmp/.timestamp
+    if [ /tmp/.timestamp -ot /media/mmcblk0p1/.timestamp ];
+    then
+        echo "Waiting for system clock sync..."
+        continue
+    fi
+
+    break
+done
+
 CNT=0
 while true
 do

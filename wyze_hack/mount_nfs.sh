@@ -71,7 +71,7 @@ do
     echo "Notifying iCamera about SD card insertion event..."
     touch /dev/mmcblk0
     touch /dev/mmcblk0p1
-    $SCRIPT_DIR/uevent_send "add@/devices/platform/jzmmc_v1.2.0/mmc_host/mmc0/mmc0:e624/block/mmcblk0/mmcblk0p1"
+    $SCRIPT_DIR/bin/uevent_send "add@/devices/platform/jzmmc_v1.2.0/mmc_host/mmc0/mmc0:e624/block/mmcblk0/mmcblk0p1"
 
     break
 done

@@ -5,8 +5,9 @@ then
     exit 1
 fi
 
+umount /etc
+rm -rf /tmp/etc
 cp -r /etc /tmp/
 echo $PASSWD_SHADOW >/tmp/etc/shadow
-umount /etc
 mount -o bind /tmp/etc /etc
 telnetd

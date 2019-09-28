@@ -8,6 +8,9 @@ This project contains a set of scripts to provide additional features not possib
 6. Automatically archive the recordings.
 
 
+*** BREAKING CHANGE ***  
+The latest version 0.0.1.00 has some breaking changes. To install this version on a camera with previous wyze hack installed, you will need to reset the camera's firmware by flashing the firmware image (demo.bin) using SD card first. Otherwise you may leave your camera in an unusable state (recoverable with the SD card firmware reflashing method).
+
 INSTALLATION:
 There are two ways to install this hack:
 * First time install, or after factory reset/firmware update. This means there is no wyzehack currently running on the camera. In this case you will need to use the SD card installation method:
@@ -22,7 +25,7 @@ There are two ways to install this hack:
 * When you are updating a camera with older wyzehack running. In this case physical SD card will no longer be recognized, so you need to install it from the telnet:
   1. Put this repo into an NFS share where you can access from the device.
   2. Make a copy config.inc-TEMPLATE to the same directory, rename it to config.inc, and update the content accordingly
-  3. telnet into the device, and run "install.sh" from the NFS share.
+  3. telnet into the device, and run install.sh from the NFS share.
   4. Once the script finishes, reboot the camera by typing "reboot" from the telnet console.
 
 

@@ -2,14 +2,20 @@
 SCRIPT_DIR=`readlink -f $0`
 SCRIPT_DIR=`dirname $SCRIPT_DIR`
 
-# debugging
-if [ -d /media/mmcblk0p1/debug ];
-then
-    rm -rf /media/mmcblk0p1/debug/*
+$SCRIPT_DIR/wyze_hack/playwav.sh $SCRIPT_DIR/wyze_hack/snd/start.wav 80
 
+# debugging
+if [ -d /media/mmcblk0p1/debug/ ];
+then
     # Redirecting console logs to SD card
     exec >/media/mmcblk0p1/debug/install.log
     exec 2>&1
+fi
+
+if [ -f /media/mmcblk0p1/debug/.copyfiles ];
+then
+    rm -rf /media/mmcblk0p1/debug/system
+    rm -rf /media/mmcblk0p1/debug/etc
 
     # Copying system and etc back to SD card for analysis
     cp -rL /system /media/mmcblk0p1/debug
@@ -25,56 +31,47 @@ export PASSWD_SHADOW='root::10933:0:99999:7:::'
 $SCRIPT_DIR/wyze_hack/bind_etc.sh
 
 # Version check
-WYZE_VER=`grep AppVer /system/bin/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g'`
-if [ -z "$WYZE_VER" ];
+source $SCRIPT_DIR/wyze_hack/app_ver.inc
+source $SCRIPT_DIR/wyze_hack/hack_ver.inc
+
+if [ -z "$WYZEAPP_VER" ];
 then
     echo "Wyze version not found!!!"
     exit 1
 fi
 
-echo "Current Wyze software version is $WYZE_VER"
-if [ ! -d $SCRIPT_DIR/wyze_hack/$WYZE_VER ];
-then
-    echo "Wyze version $WYZE_VER not supported!!!"
-    exit 1
-fi
-
-source $SCRIPT_DIR/wyze_hack/ver.inc
-echo "Installing WyzeHacks version $SCRIPT_VER"
+echo "Current Wyze software version is $WYZEAPP_VER"
+echo "Installing WyzeHacks version $WYZEHACK_VER"
 
 # Clear update files to avoid update loop
 rm /media/mmcblk0p1/version.ini.old
 mv /media/mmcblk0p1/version.ini /media/mmcblk0p1/version.ini.old
 
 # Copying wyze_hack scripts
-cp -r $SCRIPT_DIR/wyze_hack /system/wyze_hack_$SCRIPT_VER
+WYZEHACK_DIR=/system/wyze_hack
+cp $WYZEHACK_DIR/config.inc /tmp/config.inc
+rm -rf $WYZEHACK_DIR
+cp -r $SCRIPT_DIR/wyze_hack $WYZEHACK_DIR
+cp /tmp/config.inc $WYZEHACK_DIR/
 
 # Updating user config if exists
 if [ -f $SCRIPT_DIR/config.inc ];
 then
-    cp  $SCRIPT_DIR/config.inc /system/wyze_hack_$SCRIPT_VER/
+    cp  $SCRIPT_DIR/config.inc $WYZEHACK_DIR/
 fi
 
 if [ -f /media/mmcblk0p1/config.inc ];
 then
-    cp /media/mmcblk0p1/config.inc /system/wyze_hack_$SCRIPT_VER/
-fi
-
-if [ -f /system/wyze_hack/config.inc ];
-then
-    cp /system/wyze_hack/config.inc /system/wyze_hack_$SCRIPT_VER/
+    cp /media/mmcblk0p1/config.inc $WYZEHACK_DIR/
 fi
 
 # Hook app_init.sh
-cp -r $SCRIPT_DIR/wyze_hack/$WYZE_VER/* /system/init/
-chmod a+x /system/init/app_init.sh
+$WYZEHACK_DIR/hookup.sh
 
-# Swapping the installation
-rm -rf /system/wyze_hack
-ln -s /system/wyze_hack_$SCRIPT_VER /system/wyze_hack
+$SCRIPT_DIR/wyze_hack/playwav.sh $SCRIPT_DIR/wyze_hack/snd/done.wav 80
 
 # Debugging ...
-if [ -f /media/mmcblk0p1/.noreboot ];
+if [ -f /media/mmcblk0p1/debug/.noreboot ];
 then
     while true
     do
