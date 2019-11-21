@@ -1,7 +1,7 @@
 #!/bin/sh
 mkdir -p .tmp/Upgrade
 echo FWGRADEUP=app > .tmp/Upgrade/PARA
-cp install.sh .tmp/Upgrade/upgraderun.sh
+cp upgraderun.sh .tmp/Upgrade/
 cp -r wyze_hack .tmp/Upgrade/
 
 tar -cvf ./release/FIRMWARE_660R.bin -C ./.tmp Upgrade

@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 export CROSS_COMPILE=$(pwd)/../toolchain/bin/mips-linux-gnu-
-pushd ../kernel && make modules_prepare
+pushd ../kernel
+make modules_prepare
 popd
 make clean
 make
