@@ -1,3 +1,5 @@
-config.inc
+release/config.inc
+release/version.ini
+release/FIRMWARE_660R.bin
 .vscode
 

@@ -72,4 +72,10 @@ then
 fi
 
 $THIS_DIR/playwav.sh $THIS_DIR/snd/finished.wav 50
+
+sleep 10
+
+rm /media/mmcblk0p1/version.ini.old	
+mv /media/mmcblk0p1/version.ini /media/mmcblk0p1/version.ini.old
+
 echo "Done"

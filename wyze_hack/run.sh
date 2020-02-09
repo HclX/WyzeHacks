@@ -26,7 +26,7 @@ else
     export PASSWD_SHADOW='root::10933:0:99999:7:::'
 fi
 
-if [ -z "$SYNC_BOOT_LOG" ];
+if [ ! -z "$SYNC_BOOT_LOG" ];
 then
     exec >>/tmp/boot.log
     exec 2>&1
