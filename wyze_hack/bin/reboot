@@ -1,6 +1,13 @@
 #!/bin/sh
 echo "Camera is rebooting in 10 seconds ..."
-/system/wyze_hack/hookup.sh
+
+if [ ! -f /system/.system ];
+then
+    echo "System partition not mounted, mounting..."
+    mount -t jffs2 /dev/mtdblock4 /system
+fi
+
+$WYZEHACK_DIR/hook_init.sh
 
 sleep 10
 /sbin/reboot $@

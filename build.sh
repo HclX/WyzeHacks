@@ -1,8 +1,13 @@
 #!/bin/sh
+. wyze_hack/hack_ver.inc
+
 mkdir -p .tmp/Upgrade
 echo FWGRADEUP=app > .tmp/Upgrade/PARA
+
+sed "s/__WYZEHACK_VER__/$WYZEHACK_VER/g" wyze_hack.sh > .tmp/Upgrade/wyze_hack.sh
+tar -cvz -O wyze_hack >>.tmp/Upgrade/wyze_hack.sh
+
 cp upgraderun.sh .tmp/Upgrade/
-cp -r wyze_hack .tmp/Upgrade/
 
 tar -cvf ./release/FIRMWARE_660R.bin -C ./.tmp Upgrade
 
@@ -14,7 +19,5 @@ version=9.9.9.9
 type=1
 md5=$MD5
 EOL
-
-mkdir -p ./release/debug
 
 rm -rf .tmp

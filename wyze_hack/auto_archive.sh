@@ -1,7 +1,4 @@
 #!/bin/sh
-SCRIPT_DIR=`readlink -f $0`
-SCRIPT_DIR=`dirname $SCRIPT_DIR`
-
 if [ -z "$ARCHIVE_OLDER_THAN" ];
 then
     # Auto archive not enabled

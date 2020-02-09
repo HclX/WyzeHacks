@@ -1,7 +1,4 @@
 #!/bin/sh
-SCRIPT_DIR=`readlink -f $0`
-SCRIPT_DIR=`dirname $SCRIPT_DIR`
-
 if [ -z "$NFS_ROOT" ];
 then
     echo "NFS_ROOT not configured, skipping NFS mount..."
@@ -69,15 +66,15 @@ do
     ifconfig > /media/mmcblk0p1/ifconfig.txt 2>&1
 
     echo "Notifying iCamera about SD card insertion event..."
-    $SCRIPT_DIR/bin/uevent_send "add@/devices/platform/jzmmc_v1.2.0/mmc_host/mmc0/mmc0:e624/block/mmcblk0/mmcblk0p1"
+    $WYZEHACK_DIR/bin/uevent_send "add@/devices/platform/jzmmc_v1.2.0/mmc_host/mmc0/mmc0:e624/block/mmcblk0/mmcblk0p1"
     touch /dev/mmcblk0
     touch /dev/mmcblk0p1
-    insmod $SCRIPT_DIR/bin/dummy_mmc.ko
+    insmod $WYZEHACK_DIR/bin/dummy_mmc.ko
 
     break
 done
 
-$SCRIPT_DIR/log_sync.sh &
-$SCRIPT_DIR/auto_reboot.sh &
-$SCRIPT_DIR/auto_archive.sh &
+$WYZEHACK_DIR/log_sync.sh &
+$WYZEHACK_DIR/auto_reboot.sh &
+$WYZEHACK_DIR/auto_archive.sh &
 
