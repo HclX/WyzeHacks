@@ -18,6 +18,6 @@ mkdir -p $TARGET_DIR
 export THIS_DIR=$TARGET_DIR/wyze_hack
 
 PAYLOAD_START=`awk '/^#__PAYLOAD_BELOW__/ {print NR + 1; exit 0; }' $0`
-tail -n+$PAYLOAD_START $0 | gzip -cd | tar xv -f - -C $TARGET_DIR
+tail -n+$PAYLOAD_START $0 | gzip -cd | tar x -f - -C $TARGET_DIR
 exec sh $THIS_DIR/$ACTION.sh $@
 #__PAYLOAD_BELOW__
