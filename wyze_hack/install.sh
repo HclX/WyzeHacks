@@ -48,7 +48,7 @@ echo "Installing WyzeHacks version $THIS_VER"
 if [ -f /media/mmcblk0p1/config.inc ];
 then
     echo "Copying configuration files..."
-    cp /media/mmcblk0p1/config.inc $WYZEHACK_CFG
+    sed 's/\r$//' /media/mmcblk0p1/config.inc > $WYZEHACK_CFG
 fi
 
 if [ ! -f $WYZEHACK_CFG ];
@@ -72,10 +72,8 @@ then
 fi
 
 $THIS_DIR/playwav.sh $THIS_DIR/snd/finished.wav 50
-
+echo "Done, reboot in 10 seconds..."
 sleep 10
 
 rm /media/mmcblk0p1/version.ini.old	
 mv /media/mmcblk0p1/version.ini /media/mmcblk0p1/version.ini.old
-
-echo "Done"
