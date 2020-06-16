@@ -62,3 +62,9 @@ To uninstall the hack, I recommend you go through the SD card recovery method in
 
 3. The installation doesn't work for me, anyway to debug?
 On SD card there should be a file named "install.log" containing the actual error message if anything failed during the install.
+
+4. How can I modify the configurations after installation?
+The config file is stored at `/params/wyzehacks.cfg`. You can telnet into the device and modify it with `vi`. You will need to reboot the device (by running `reboot` command over telnet) to make the changes effective.
+
+5. Are there ways to access the console logs other than over serial connection?
+By default all the console outputs are over serial connection. With wyze hacks installed, it redirect all the logs to file `/tmp/boot.log`. So you can telnet into the device and check this file for console logs. Even better, if you enable the "log syncing" function in configuration files, the log file will be synchronized to your NFS share at almost real time (~5 seconds delay).
