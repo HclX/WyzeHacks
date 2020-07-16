@@ -9,6 +9,9 @@ LDFLAG = -muclibc -Wl,-gc-sections
 
 all: uevent_send uevent_recv libhacks.so
 
+clean:
+	@rm -rf *.o uevent_send uevent_recv libhacks.so
+
 libhacks.so: libhacks.c
 	$(CC) $(CFLAGS) --shared -fPIC -ldl $^ -o $@
 

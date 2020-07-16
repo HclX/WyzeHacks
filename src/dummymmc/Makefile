@@ -1,10 +1,6 @@
-CROSS_COMPILE ?= mips-linux-uclibc-gnu-
+CROSS_COMPILE ?= $(pwd)/../.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu-
+KDIR ?= $(pwd)/../.tmp/kernel-master
 
-ifeq (${ISVP_ENV_KERNEL_DIR}, )
-	ISVP_ENV_KERNEL_DIR = ../kernel
-endif
-
-KDIR := ${ISVP_ENV_KERNEL_DIR}
 MODULE_NAME := dummy_mmc
 
 all: modules
@@ -15,8 +11,10 @@ all: modules
 obj-m := $(MODULE_NAME).o
 
 modules:
+	@$(MAKE) -C $(KDIR) modules_prepare
 	@$(MAKE) -C $(KDIR) M=$(shell pwd) $@
 
 clean:
+	@$(MAKE) -C $(KDIR) clean
 	@rm -rf *.o *~ .depend .*.cmd  *.mod.c .tmp_versions *.ko *.symvers modules.order
 	@rm -f dummy_mmc.ko
