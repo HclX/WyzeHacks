@@ -38,4 +38,4 @@ then
     $WYZEHACK_DIR/mount_nfs.sh &
 fi
 
-/system/init/app_init_orig.sh
+LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so /system/init/app_init_orig.sh

@@ -23,6 +23,12 @@ do
         continue
     fi
 
+    if ! pidof telnetd;
+    then
+        echo "Starting telnetd..."
+        telnetd
+    fi
+
     if ! /bin/mount | grep -q "$NFS_ROOT on /mnt";
     then
         echo "$NFS_ROOT not mounted, try mounting to /mnt..."
@@ -59,6 +65,14 @@ do
     if ! mount -o bind $CAM_DIR /media/mmcblk0p1;
     then
         echo "mount $CAM_DIR as /media/mmcblk0p1 failed, will retry..."
+        continue
+    fi
+
+    echo "Mounting camera directory $NFS_ROOT/$CAM_DIR on /media/mmc"
+    mkdir -p /media/mmc
+    if ! mount -o bind $CAM_DIR /media/mmc;
+    then
+        echo "mount $CAM_DIR as /media/mmc failed, will retry..."
         continue
     fi
 
