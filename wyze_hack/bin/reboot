@@ -1,6 +1,5 @@
 #!/bin/sh
 echo "Camera is rebooting in 10 seconds ..."
-
 if [ ! -f /system/.system ];
 then
     echo "System partition not mounted, mounting..."
@@ -9,5 +8,5 @@ fi
 
 $WYZEHACK_DIR/hook_init.sh
 
-sleep 10
+sync
 /sbin/reboot $@

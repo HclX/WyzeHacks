@@ -1,5 +1,5 @@
-CROSS_COMPILE ?= $(pwd)/../.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu-
-KDIR ?= $(pwd)/../.tmp/kernel-master
+CROSS_COMPILE?=$(CURDIR)/../.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu-
+KDIR?=$(CURDIR)/../.tmp/kernel-master
 
 MODULE_NAME := dummy_mmc
 

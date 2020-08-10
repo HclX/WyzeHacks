@@ -91,4 +91,3 @@ done
 $WYZEHACK_DIR/log_sync.sh &
 $WYZEHACK_DIR/auto_reboot.sh &
 $WYZEHACK_DIR/auto_archive.sh &
-

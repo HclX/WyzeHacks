@@ -6,6 +6,7 @@
 #include <string.h>
 #include <dlfcn.h>
 #include <sys/mount.h>
+#include <sys/vfs.h>
 
 int mount(const char *source, const char *target,
     const char *filesystemtype, unsigned long mountflags, const void *data) {
@@ -29,4 +30,41 @@ int mount(const char *source, const char *target,
     } else {
         return s_pfn(source, target, filesystemtype, mountflags, data);
     }
+}
+
+int statfs(const char *path, struct statfs *buf) {
+    typedef int (*PFN_statfs)(const char *path, struct statfs *buf);
+
+    static PFN_statfs s_pfn = NULL;
+    if (s_pfn == NULL) {
+        s_pfn = dlsym(RTLD_NEXT, "statfs");
+        if (s_pfn == NULL) {
+            printf("dlsym returns NULL for 'statfs'!\n");
+            return -1;
+        }
+    }
+
+    printf("statfs(path=%s, buf=%p)\n", path, buf);
+    int ret = s_pfn(path, buf);
+    if (ret) {
+        return ret;
+    }
+
+    if (strncmp(path, "/media/mmc", strlen("/media/mmc")) == 0) {
+        unsigned long blocks_per_gb = 0x40000000 / buf->f_bsize;
+
+        if (buf->f_bfree > blocks_per_gb * 2048) {
+            // Limit maximum free space to 2TB
+            buf->f_bfree = blocks_per_gb * 2048;
+            buf->f_bavail = blocks_per_gb * 2048;
+        }
+
+        buf->f_blocks = buf->f_bfree;
+        if (buf->f_blocks < blocks_per_gb * 64 ) {
+            // Limit minimum total space to be 64GB
+            buf->f_blocks = blocks_per_gb * 64;
+        }
+    }
+
+    return ret;
 }

@@ -45,9 +45,15 @@ echo "Current Wyze software version is $WYZEAPP_VER"
 echo "Installing WyzeHacks version $THIS_VER"
 
 # Updating user config if exists
+if [ -f /tmp/Upgrade/config.inc ];
+then
+    echo "Use config file /tmp/Upgrade/config.inc"
+    sed 's/\r$//' /tmp/Upgrade/config.inc > $WYZEHACK_CFG
+fi
+
 if [ -f /media/mmcblk0p1/config.inc ];
 then
-    echo "Copying configuration files..."
+    echo "Use config file /media/mmcblk0p1/config.inc"
     sed 's/\r$//' /media/mmcblk0p1/config.inc > $WYZEHACK_CFG
 fi
 
@@ -72,8 +78,8 @@ then
 fi
 
 $THIS_DIR/playwav.sh $THIS_DIR/snd/finished.wav 50
-echo "Done, reboot in 10 seconds..."
-sleep 10
 
 rm /media/mmcblk0p1/version.ini.old	
 mv /media/mmcblk0p1/version.ini /media/mmcblk0p1/version.ini.old
+
+reboot
