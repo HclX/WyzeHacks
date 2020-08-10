@@ -10,6 +10,7 @@ cp -u src/utils/uevent_send wyze_hack/bin/
 RELEASE=`echo "$WYZEHACK_VER"|tr '.' '_'`
 mkdir -p ./release/$RELEASE
 rm -rf ./release/$RELEASE/*
+rm ./release/wyze_hacks_$RELEASE.zip
 
 mkdir -p .tmp/Upgrade
 echo FWGRADEUP=app > .tmp/Upgrade/PARA
@@ -32,5 +33,5 @@ type=1
 md5=$MD5
 EOL
 
-zip -j -u ./release/wyze_hacks_$RELEASE.zip ./release/$RELEASE/*
+zip -j ./release/wyze_hacks_$RELEASE.zip ./release/$RELEASE/*
 cp ./release/config.inc ./release/$RELEASE/
