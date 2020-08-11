@@ -15,6 +15,7 @@ following functions:
 * Due to new firmware blocking SD card installation, a new remote installation
 method has to be used.
 * SD card size emulation to make sure the hack works with large NFS shares.
+* Support NFS mount command line options in config file.
 
 # Download and installation
 The latest release archive can be found in the [release folder]
@@ -46,13 +47,16 @@ for 2FA authentication.
 5. The login credentials will be stored in a local file named ".tokens" for
 future use so you don't need to enter username and password and 2FA everytime.
 Make sure you don't share this file with anyone you don't trust.
-5. Once correctly authenticated, it will go through all the Wyze Cameras under
+6. The token seems to have an expiration period. So next time if you run into
+error with something like "Access token error" please delete ".tokens" file and
+restart.
+7. Once correctly authenticated, it will go through all the Wyze Cameras under
 your account, asking you for each of them if you want to push the wyzehack onto
 that camera. Enter 'Y' if yes, otherwise 'N'. Press "Ctrl + C" twice to
 interrupt the process.
-6. Once confirmed, you will hear "installation begins" from the target camera,
+8. Once confirmed, you will hear "installation begins" from the target camera,
 and then "installation finished" confirming the installation.
-7. When you are done, make sure delete ".tokens" file from that archive folder
+9. When you are done, make sure delete ".tokens" file from that archive folder
 to avoid accidental leak of your logins. 
 
 ## SD card install
@@ -164,6 +168,27 @@ You will need to perform a SD card recovery with the following steps:
 To uninstall the hack, I recommend you go through the SD card recovery method 
 in #1 and then perform a factory reset.
 
-## The installation doesn't work for me, anyway to debug?
-On SD card there should be a file named "install.log" containing the actual 
-error message if anything failed during the install.
+## It keeps saying "installation failed", anyway to debug?
+On SD card there should be a file named "install.log" containing every command
+executed during the installation. It should give you a rough idea why it's
+failing. The most likely failure reason would be missing configuration file.
+Depending on how you install, you need to put the config.inc file to the right
+location for the installer to pickup.
+
+## I don't get anything on my NFS share. What can go wrong?
+If you hear the "installation finished successfully" message, but still don't
+get any video recordings in the expected NFS share, it's very likely something
+wrong with your NFS share configuration. A couple ways to debug this:
+1. Check the SD card information from the app, if it says SD card not installed,
+there is something wrong with your NFS config.
+2. At this moment, you should have telnet enabled, try telnet into the camera
+and run "mount" to see if you have the NFS share correctly mounted.
+3. If mount shows no NFS file system is mounted, try to mount the share manually
+with the following commands and see what error message you get:
+```
+source /params/wyze_hack.cfg
+mount $NFS_OPTIONS $NFS_ROOT /mnt
+```
+5. At this point you will need to figure out what's wrong with your config file,
+and try to see if you can fix it by tweaking NFS_ROOT and NFS_OPTIONS in file 
+`/params/wyze_hack.cfg`. You can edit this file over telnet with `vi` command.

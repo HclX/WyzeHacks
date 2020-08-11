@@ -5,7 +5,7 @@ then
     exit 1
 fi
 
-NFS_MOUNT="/bin/mount -o nolock,rw"
+NFS_MOUNT="/bin/mount $NFS_OPTIONS"
 
 DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g'`
 if [ -z "$DEVICE_ID" ];

@@ -5,7 +5,7 @@ cp ./FIRMWARE_660R.bin ./firmware.bin
 
 if [ -f config.inc ]; then
     echo "Found local config file, including into firmware update archive..."
-    mkdir ./Upgrade
+    mkdir -p ./Upgrade
     cp config.inc ./Upgrade
     tar -rvf ./firmware.bin Upgrade/config.inc
 fi
