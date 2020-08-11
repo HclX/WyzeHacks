@@ -1,3 +1,9 @@
+.vscode
 release/*
 !release/*.zip
-.vscode
+installer/config.inc
+installer/version.ini
+installer/FIRMWARE_660R.bin
+installer/firmware.bin
+installer/Upgrade
+installer/.tokens

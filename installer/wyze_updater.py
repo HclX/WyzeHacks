@@ -1,0 +1,1 @@
+../WyzeUpdater/wyze_updater.py

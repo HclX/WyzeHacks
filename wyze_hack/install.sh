@@ -1,9 +1,16 @@
 #!/bin/sh
+set -x
 
 # Redirecting console logs to SD card
-if [ -d /media/mmcblk0p1/ ];
+SD_DIR=/media/mmcblk0p1
+if [ ! -d $SD_DIR ];
 then
-    exec >/media/mmcblk0p1/install.log
+    SD_DIR=/media/mmc
+fi
+
+if [ -d $SD_DIR ];
+then
+    exec >$SD_DIR/install.log
     exec 2>&1
 fi
 
@@ -11,20 +18,21 @@ echo "Starting wyze hack installer..."
 
 $THIS_DIR/playwav.sh $THIS_DIR/snd/begin.wav 50
 
-if [ -f /media/mmcblk0p1/debug/.copyfiles ];
+if [ -f $SD_DIR/debug/.copyfiles ];
 then
     echo "Copying files for debugging purpose..."
-    rm -rf /media/mmcblk0p1/debug/system
-    rm -rf /media/mmcblk0p1/debug/etc
+    rm -rf $SD_DIR/debug/system
+    rm -rf $SD_DIR/debug/etc
 
     # Copying system and etc back to SD card for analysis
-    cp -rL /system /media/mmcblk0p1/debug
-    cp -rL /etc /media/mmcblk0p1/debug
+    cp -rL /system $SD_DIR/debug
+    cp -rL /etc $SD_DIR/debug
 fi
 
 # Always try to enable telnetd
 echo "Enabling telnetd..."
 echo 1>/configs/.Server_config
+telnetd
 
 # Swapping shadow file so we can telnetd in without password. This
 # is for debugging purpose.
@@ -51,10 +59,10 @@ then
     sed 's/\r$//' /tmp/Upgrade/config.inc > $WYZEHACK_CFG
 fi
 
-if [ -f /media/mmcblk0p1/config.inc ];
+if [ -f $SD_DIR/config.inc ];
 then
-    echo "Use config file /media/mmcblk0p1/config.inc"
-    sed 's/\r$//' /media/mmcblk0p1/config.inc > $WYZEHACK_CFG
+    echo "Use config file $SD_DIR/config.inc"
+    sed 's/\r$//' $SD_DIR/config.inc > $WYZEHACK_CFG
 fi
 
 if [ ! -f $WYZEHACK_CFG ];
@@ -79,7 +87,7 @@ fi
 
 $THIS_DIR/playwav.sh $THIS_DIR/snd/finished.wav 50
 
-rm /media/mmcblk0p1/version.ini.old	
-mv /media/mmcblk0p1/version.ini /media/mmcblk0p1/version.ini.old
+rm $SD_DIR/version.ini.old > /dev/null 2>&1	
+mv $SD_DIR/version.ini $SD_DIR/version.ini.old > /dev/null 2>&1
 
 reboot
