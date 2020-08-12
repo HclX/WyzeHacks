@@ -10,5 +10,6 @@ if [ -f config.inc ]; then
     tar -rvf ./firmware.bin Upgrade/config.inc
 fi
 
+python3 -m pip install requests
 python3 ./wyze_updater.py update \
     -m WYZEC1-JZ -m WYZECP1_JEF -f ./firmware.bin -p 11808
