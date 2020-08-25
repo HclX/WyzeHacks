@@ -1,7 +1,7 @@
 # WyzeHacks
-This project contains a set of scripts to provide additional features not
-implemented by the official wyze camera firmware. Currently, it provides the 
-following functions:
+This project contains a set of scripts trying to provide additional features not
+implemented by the official firmware. Currently, it provides the following
+functions:
 1. Enable telnetd on your camera.
 2. Customize the default root password for telnet login.
 3. Redirect all the recordings to an NFS share.
@@ -91,7 +91,7 @@ the latest hack installed.
 ## NFS share naming:
   The per camera NFS share was named by the camera's MAC address, but it's very
   inconvinent to manage if you have many cameras. As a result, a recent change
-  now support customizing the folder name. All you need is renaming the folder
+  now supports customizing folder names. All you need is renaming the folder
   from desktop to whatever you want and reboot the camera. The camera should
   remember whatever folder is using and will continue recording into the renamed
   folder. This feature is automatically enabled with latest version so no need
@@ -112,28 +112,29 @@ the latest hack installed.
   this has some security concerns as the boot log contains your credentials. 
   To avoid that, this feature is only enabled if you uncomment a variable in 
   the configuration file. 
+
   !!!NEVER SHARE YOUR BOOT LOG FILE WITH OTHERS OR YOUR ACCOUNT CAN BE 
   COMPROMISED!!!
 ## Auto archiving:
   I noticed after accumulating many days of recordings, the camera is behaving 
   strangely when you try to playback the recordings from Wyze app. To avoid 
-  that, now you can enable "auto archiving" feature by uncomment a configuration 
+  that, now you can enable "auto archiving" feature by uncommenting a config 
   variable. Older recordings will be moved to a different location which is not 
-  discoverable by the wyze app. You can always review them from your desktop.
+  discoverable by the Wyze app. You can always review them from your desktop.
 ## SD card size emulation
   People reports the hack doesn't work with NFS shares bigger than a certain 
   size. So I added a SD card size emulation so that no matter how big your NFS 
   share is, the hack will always report an acceptable size with used space set 
-  to zero unless your free space is less than 64GB, in which case, it will 
-  report a 64GB SD card with the correct free space information.
+  to zero unless your free space is less than 16GB, in which case, it will 
+  report a 16GB SD card with the correct free space information.
 
 # Disclaimer:
 * This is just a personal fun project without extensive test, so use it at your 
 own risk.
-* Be nice to Wyze: It's because of their effort we have a cheap platform to play
+* Be nice to Wyze: Because of their effort we have a cheap platform to play
 around. If you run into issues after installing this hack, make sure you verify
-the issue not caused by the hack itself before you call Wyze's customer support
-or return the device.
+the issue is not caused by the hack itself before you call Wyze's customer
+support or return the device.
 * The NFS share will need to be writable. Things can happen to the files in that
 share. For example, if you do a "format SD card" from the camera. In theory the
 operations should be limitted to the specific directory mapped for a particular
@@ -175,6 +176,15 @@ failing. The most likely failure reason would be missing configuration file.
 Depending on how you install, you need to put the config.inc file to the right
 location for the installer to pickup.
 
+## My NFS share has more than 1TB space, why does it say only 512GB in the app?
+The firwmare is designed to handle SD card, which usually has a much smaller
+size. With large size like this, the firmware will behave incorrectly. To avoid
+issues, the hack limits the emulated SD card to maximum 512GB. If your NFS share
+has more than 16GB free space, you will see an SD card with the size set to your
+available free space (capped to 512GB). If your share has a free space lower
+than 16GB, the device will see a 16GB SD card, with free space set to your
+actual free space.
+
 ## I don't get anything on my NFS share. What can go wrong?
 If you hear the "installation finished successfully" message, but still don't
 get any video recordings in the expected NFS share, it's very likely something
@@ -192,3 +202,14 @@ mount $NFS_OPTIONS $NFS_ROOT /mnt
 5. At this point you will need to figure out what's wrong with your config file,
 and try to see if you can fix it by tweaking NFS_ROOT and NFS_OPTIONS in file 
 `/params/wyze_hack.cfg`. You can edit this file over telnet with `vi` command.
+
+## I see files but no recordings on my NFS shares.
+People report this kind of behavior and it seems to be caused by NFS share with
+size larger than a certain amount. Try make a smaller share or use "NFS quota"
+to limit the size. Issue #19 might be a related one.
+
+## Known issues.
+1. With release 0.4.00 and firmware 4.9.6.156 (WyzeCamV2) and 4.10.6.156 
+(WyzeCam Pan), I noticed sometimes the NFS share will be unmounted. The root 
+cause is still unclear, but I believe it may have something to do with 
+firmware's bad SD card detection.
