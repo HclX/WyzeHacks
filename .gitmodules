@@ -1,6 +1,3 @@
-[submodule "src/toolchain"]
-	path = src/toolchain
-	url = https://github.com/Dafang-Hacks/mips-gcc472-glibc216-64bit.git
-[submodule "src/kernel"]
-	path = src/kernel
-	url = https://github.com/Dafang-Hacks/kernel.git
+[submodule "WyzeUpdater"]
+	path = WyzeUpdater
+	url = https://github.com/HclX/WyzeUpdater.git

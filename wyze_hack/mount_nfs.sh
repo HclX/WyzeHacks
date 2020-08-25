@@ -5,7 +5,7 @@ then
     exit 1
 fi
 
-NFS_MOUNT="/bin/mount -o nolock,rw"
+NFS_MOUNT="/bin/mount $NFS_OPTIONS"
 
 DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g'`
 if [ -z "$DEVICE_ID" ];
@@ -21,6 +21,12 @@ do
     then
         echo "wlan0 not ready yet..."
         continue
+    fi
+
+    if ! pidof telnetd;
+    then
+        echo "Starting telnetd..."
+        telnetd
     fi
 
     if ! /bin/mount | grep -q "$NFS_ROOT on /mnt";
@@ -62,6 +68,14 @@ do
         continue
     fi
 
+    echo "Mounting camera directory $NFS_ROOT/$CAM_DIR on /media/mmc"
+    mkdir -p /media/mmc
+    if ! mount -o bind $CAM_DIR /media/mmc;
+    then
+        echo "mount $CAM_DIR as /media/mmc failed, will retry..."
+        continue
+    fi
+
     touch /media/mmcblk0p1/.mac_$DEVICE_ID
     ifconfig > /media/mmcblk0p1/ifconfig.txt 2>&1
 
@@ -77,4 +91,3 @@ done
 $WYZEHACK_DIR/log_sync.sh &
 $WYZEHACK_DIR/auto_reboot.sh &
 $WYZEHACK_DIR/auto_archive.sh &
-
