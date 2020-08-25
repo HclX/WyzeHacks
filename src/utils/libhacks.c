@@ -7,6 +7,7 @@
 #include <dlfcn.h>
 #include <sys/mount.h>
 #include <sys/vfs.h>
+#include <linux/magic.h>
 
 int mount(const char *source, const char *target,
     const char *filesystemtype, unsigned long mountflags, const void *data) {
@@ -46,25 +47,49 @@ int statfs(const char *path, struct statfs *buf) {
 
     printf("statfs(path=%s, buf=%p)\n", path, buf);
     int ret = s_pfn(path, buf);
-    if (ret) {
+    if (strncmp(path, "/media/mmc", strlen("/media/mmc")) != 0) {
         return ret;
     }
 
-    if (strncmp(path, "/media/mmc", strlen("/media/mmc")) == 0) {
-        unsigned long blocks_per_gb = 0x40000000 / buf->f_bsize;
-
-        if (buf->f_bfree > blocks_per_gb * 2048) {
-            // Limit maximum free space to 2TB
-            buf->f_bfree = blocks_per_gb * 2048;
-            buf->f_bavail = blocks_per_gb * 2048;
-        }
-
-        buf->f_blocks = buf->f_bfree;
-        if (buf->f_blocks < blocks_per_gb * 64 ) {
-            // Limit minimum total space to be 64GB
-            buf->f_blocks = blocks_per_gb * 64;
-        }
+    if (ret) {
+        perror("statfs failed.\n");
+        return ret;
     }
 
+    printf(
+        "statfs('/media/mmc'), orignal return values: "
+        "f_type=%0lX, f_bsize=%lX, f_bfree=%lX, "
+        "f_bavail=%lX, f_blocks=%lX\n",
+        buf->f_type, buf->f_bsize, buf->f_bfree,
+        buf->f_bavail, buf->f_blocks);
+
+    if (buf->f_type == TMPFS_MAGIC) {
+        printf("NFS share not mounted\n");
+        return ret;
+    }
+
+    unsigned long blocks_per_gb = 0x40000000 / buf->f_bsize;
+    if (buf->f_bavail > blocks_per_gb * 16) {
+        // If there are more than 16GB free space, we will emulate an
+        // empty SD card whose total space equals to the free space up
+        // to 512GB
+        if (buf->f_bavail > blocks_per_gb * 512) {
+            // Limit free space to 512GB
+            buf->f_bavail = blocks_per_gb * 512;
+        }
+        buf->f_blocks = buf->f_bfree = buf->f_bavail;
+    } else {
+        // If there are less than 16GB free space, we will emulate an 
+        // SD card of 16GB, with free space to whatever left.
+        buf->f_blocks = blocks_per_gb * 16;
+        buf->f_bfree = buf->f_bavail;
+    }
+
+    printf(
+        "statfs('/media/mmc'), modified return values: "
+        "f_type=%lX, f_bsize=%lX, f_bfree=%lX, "
+        "f_bavail=%lX, f_blocks=%lX\n",
+        buf->f_type, buf->f_bsize, buf->f_bfree,
+        buf->f_bavail, buf->f_blocks);
     return ret;
 }
