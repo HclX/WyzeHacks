@@ -96,13 +96,13 @@ $WYZEHACK_DIR/auto_archive.sh &
 while true
 do
     /bin/mount > /tmp/mount.txt
-    if ! grep "/media/mmcblk0p1 type nfs" /tmp/mount.txt;
+    if ! grep "/media/mmcblk0p1 type nfs" /tmp/mount.txt > /dev/null 2>&1;
     then
         echo "NFS no longer mounted as /media/mmcblk0p1"
         break
     fi
 
-    if ! grep "/media/mmc type nfs" /tmp/mount.txt;
+    if ! grep "/media/mmc type nfs" /tmp/mount.txt > /dev/null 2>&1;
     then
         echo "NFS no longer mounted as /media/mmc"
         break
