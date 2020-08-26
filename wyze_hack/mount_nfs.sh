@@ -91,3 +91,30 @@ done
 $WYZEHACK_DIR/log_sync.sh &
 $WYZEHACK_DIR/auto_reboot.sh &
 $WYZEHACK_DIR/auto_archive.sh &
+
+# Detecting NFS share mount failure
+while true
+do
+    /bin/mount > /tmp/mount.txt
+    if ! grep "/media/mmcblk0p1 type nfs" /tmp/mount.txt;
+    then
+        echo "NFS no longer mounted as /media/mmcblk0p1"
+        break
+    fi
+
+    if ! grep "/media/mmc type nfs" /tmp/mount.txt;
+    then
+        echo "NFS no longer mounted as /media/mmc"
+        break
+    fi
+
+    # Check for every 10 seconds
+    sleep 10
+done
+
+# This will make the log sync flush logs
+killall sleep
+sync
+sleep 3
+$WYZEHACK_DIR/playwav.sh /usr/share/notify/binbin.wav 50
+/sbin/reboot

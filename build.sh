@@ -7,7 +7,7 @@ cd $(dirname $0)
 echo "Building release $WYZEHACK_VER ..."
 
 RELEASE=`echo "$WYZEHACK_VER"|tr '.' '_'`
-rm ./release/wyze_hacks_$RELEASE.zip
+rm ./release/wyze_hacks_$RELEASE.zip 2>/dev/null || true
 
 mkdir -p .tmp/Upgrade
 echo FWGRADEUP=app > .tmp/Upgrade/PARA
