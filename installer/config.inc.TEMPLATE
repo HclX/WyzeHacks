@@ -7,8 +7,8 @@
 export NFS_ROOT='192.168.1.10:/volume1/'
 
 # Some NFS configurations may need special mount options. You can specify
-them here. The default value is verified on my camera with a NFS v3 share
-on my home server.
+# them here. The default value is verified on my camera with a NFS v3 share
+# on my home server.
 export NFS_OPTIONS='-o nolock,rw'
 
 # Uncomment and modify the AUTO_REBOOT variable to automatically reboot
