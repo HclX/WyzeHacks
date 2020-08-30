@@ -1,11 +1,17 @@
 #!/bin/sh
 if [ -z "$SYNC_BOOT_LOG" ];
 then
+    # This is to record device reboot time when log sync is not enabled
+    CNT=`ls /media/mmcblk0p1/log/reboot_* | wc -l`
+    let CNT=$CNT+1
+    touch /media/mmcblk0p1/log/reboot_$CNT
+
     # Log sync not enabled
     exit 0
 fi
 
-# Wait until the NTP client updated local time, so we can have correct log timestamp
+# Wait until the NTP client updated local time, so we can have correct log
+# timestamp
 touch /media/mmcblk0p1/.timestamp
 while true
 do

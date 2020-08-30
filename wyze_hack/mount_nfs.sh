@@ -85,6 +85,7 @@ do
     touch /dev/mmcblk0p1
     insmod $WYZEHACK_DIR/bin/dummy_mmc.ko
 
+    # $WYZEHACK_DIR/playwav.sh /usr/share/notify/binbin.wav 50
     break
 done
 
@@ -116,5 +117,4 @@ done
 killall sleep
 sync
 sleep 3
-$WYZEHACK_DIR/playwav.sh /usr/share/notify/binbin.wav 50
 /sbin/reboot
