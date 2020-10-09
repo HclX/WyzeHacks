@@ -10,6 +10,11 @@ if [ -f config.inc ]; then
     tar -rvf ./firmware.bin Upgrade/config.inc
 fi
 
+DEBUG=""
+if [ "$1" = "--debug" ]; then
+    DEBUG="$1"
+fi
+
 python3 -m pip install requests
-python3 ./wyze_updater.py update \
+python3 ./wyze_updater.py --token ~/.wyze_token $DEBUG update \
     -m WYZEC1-JZ -m WYZECP1_JEF -f ./firmware.bin -p 11808

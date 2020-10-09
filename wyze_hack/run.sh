@@ -21,9 +21,21 @@ else
     export PASSWD_SHADOW='root::10933:0:99999:7:::'
 fi
 
-if [ -z "$SYNC_BOOT_LOG" ];
+if [ ! -z "$SYNC_BOOT_LOG" ];
 then
-    $WYZEHACK_DIR/app_init.sh
-else
-    $WYZEHACK_DIR/app_init.sh >> /tmp/boot.log 2>&1
+    exec 2>&1 >> /tmp/boot.log
 fi
+
+# Special handling for updates
+if [ -f /system/.upgrade ] || [ -f /configs/.upgrade ];
+then
+    UPDATE_PENDING=1
+fi
+
+if [ -z "$UPDATE_PENDING" ] && [ -f $WYZEHACK_CFG ];
+then
+    $WYZEHACK_DIR/bind_etc.sh
+    $WYZEHACK_DIR/mount_nfs.sh & 
+fi
+
+LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so /system/init/app_init_orig.sh

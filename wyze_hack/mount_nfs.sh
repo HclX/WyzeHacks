@@ -42,18 +42,18 @@ do
     CAM_DIR=/mnt/WyzeCams/$DEVICE_ID
     for DIR in /mnt/WyzeCams/*/;
     do
-        if [ -f $DIR/.mac_$DEVICE_ID ];
+        if [ -f "$DIR/.mac_$DEVICE_ID" ];
         then
-            CAM_DIR=$DIR
+            CAM_DIR="$DIR"
             break
         fi
     done
 
     echo Mounting directory $CAM_DIR as SD card
-    if [ ! -d $CAM_DIR ];
+    if [ ! -d "$CAM_DIR" ];
     then
         echo "Creating data directory [$CAM_DIR]"
-        if ! mkdir -p $CAM_DIR;
+        if ! mkdir -p "$CAM_DIR";
         then
             echo "[mkdir -p $CAM_DIR] failed, will retry..."
             continue
@@ -62,7 +62,7 @@ do
 
     echo "Mounting camera directory $NFS_ROOT/$CAM_DIR on /media/mmcblk0p1"
     mkdir -p /media/mmcblk0p1
-    if ! mount -o bind $CAM_DIR /media/mmcblk0p1;
+    if ! mount -o bind "$CAM_DIR" /media/mmcblk0p1;
     then
         echo "mount $CAM_DIR as /media/mmcblk0p1 failed, will retry..."
         continue
@@ -70,7 +70,7 @@ do
 
     echo "Mounting camera directory $NFS_ROOT/$CAM_DIR on /media/mmc"
     mkdir -p /media/mmc
-    if ! mount -o bind $CAM_DIR /media/mmc;
+    if ! mount -o bind "$CAM_DIR" /media/mmc;
     then
         echo "mount $CAM_DIR as /media/mmc failed, will retry..."
         continue
@@ -85,13 +85,19 @@ do
     touch /dev/mmcblk0p1
     insmod $WYZEHACK_DIR/bin/dummy_mmc.ko
 
-    # $WYZEHACK_DIR/playwav.sh /usr/share/notify/binbin.wav 50
     break
 done
 
 $WYZEHACK_DIR/log_sync.sh &
 $WYZEHACK_DIR/auto_reboot.sh &
 $WYZEHACK_DIR/auto_archive.sh &
+
+# This seems to be useful to prevent reboot caused by wifi dropping.
+if [ "$PING_KEEPALIVE" == "1" ];then
+    GATEWAY_IP=`route -n | grep "UG" | awk -F' ' '{print $2}'`
+    echo "Trying to ping gateway $GATEWAY_IP..."
+    ping $GATEWAY_IP 2>&1 >/dev/null &
+fi
 
 # Detecting NFS share mount failure
 while true
@@ -109,11 +115,15 @@ do
         break
     fi
 
+    touch /media/mmc/.mac_$DEVICE_ID
+
     # Check for every 10 seconds
     sleep 10
 done
 
 # This will make the log sync flush logs
+$WYZEHACK_DIR/playwav.sh /usr/share/notify/CN/user_need_check.wav 80
+
 killall sleep
 sync
 sleep 3

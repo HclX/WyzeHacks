@@ -25,6 +25,12 @@ export NFS_OPTIONS='-o nolock,rw'
 # information and will cause your account compromise if leaked.
 # export SYNC_BOOT_LOG=1
 
+# In my setup I noticed at some occasions the camera starts rebooting frequently
+# which seems to be a result of dropping wifi connections. Running a "ping"
+# command in background seems to be solving this issue. Uncomment this variable
+# to enable this fix.
+# export PING_KEEPALIVE=1
+
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
 # generate your own password hash, use the following command from a
