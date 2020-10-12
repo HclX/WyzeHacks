@@ -108,7 +108,11 @@ do
         echo "NFS no longer mounted as /media/mmc"
         break
     fi
-
+    if ( timeout -t 60 df -h 2>&1| grep -q 'Stale NFS');
+    then
+        echo "Stale NFS handle detected"
+        break
+    fi
     # Check for every 10 seconds
     sleep 10
 done
