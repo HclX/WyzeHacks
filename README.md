@@ -10,7 +10,12 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
-## 0.4.0:
+## 0.4.01:
+* Detecting NFS unmount and automatically reboot the camera.
+* Fixing SD card size to properly support large NFS shares.
+* Fixing config.inc.TEMPLATE comments
+
+## 0.4.00:
 * Support firmware version 4.9.6.156 (WyzeCamV2) and 4.10.6.156 (WyzeCam Pan).
 * Due to new firmware blocking SD card installation, a new remote installation
 method has to be used.
