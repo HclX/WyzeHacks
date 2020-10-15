@@ -10,6 +10,12 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.4.02:
+* Adding an option to prevent wifi disconnecting.
+* Integrating TOTP based 2FA.
+* Supporting camera directory name containing space characters
+* Detecting stale NFS connection.
+
 ## 0.4.01:
 * Detecting NFS unmount and automatically reboot the camera.
 * Fixing SD card size to properly support large NFS shares.
