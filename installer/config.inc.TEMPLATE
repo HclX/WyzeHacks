@@ -31,6 +31,10 @@ export NFS_OPTIONS='-o nolock,rw'
 # to enable this fix.
 # export PING_KEEPALIVE=1
 
+# Uncomment to enable voice notification when NFS network connection lost. The
+# value should be in range of 0 and 100
+# export NOTIFICATION_VOLUME=80
+
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
 # generate your own password hash, use the following command from a
