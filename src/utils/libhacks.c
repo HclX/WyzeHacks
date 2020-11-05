@@ -72,10 +72,10 @@ int statfs(const char *path, struct statfs *buf) {
     if (buf->f_bavail > blocks_per_gb * 16) {
         // If there are more than 16GB free space, we will emulate an
         // empty SD card whose total space equals to the free space up
-        // to 512GB
-        if (buf->f_bavail > blocks_per_gb * 512) {
-            // Limit free space to 512GB
-            buf->f_bavail = blocks_per_gb * 512;
+        // to 128GB
+        if (buf->f_bavail > blocks_per_gb * 128) {
+            // Limit free space to 128GB
+            buf->f_bavail = blocks_per_gb * 128;
         }
         buf->f_blocks = buf->f_bfree = buf->f_bavail;
     } else {
