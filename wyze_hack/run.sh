@@ -36,6 +36,7 @@ if [ -z "$UPDATE_PENDING" ] && [ -f $WYZEHACK_CFG ];
 then
     $WYZEHACK_DIR/bind_etc.sh
     $WYZEHACK_DIR/mount_nfs.sh & 
+    [ -x "/params/custom.sh" ] && { /params/custom.sh & }
 fi
 
 LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so /system/init/app_init_orig.sh
