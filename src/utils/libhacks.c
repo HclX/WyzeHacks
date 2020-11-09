@@ -33,6 +33,11 @@ int mount(const char *source, const char *target,
     }
 }
 
+int umount(const char *target) {
+        printf("umount called for %s. Ignore.\n", target);
+        return 0;
+}
+
 int statfs(const char *path, struct statfs *buf) {
     typedef int (*PFN_statfs)(const char *path, struct statfs *buf);
 
