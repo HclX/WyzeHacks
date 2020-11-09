@@ -19,14 +19,14 @@ int mount(const char *source, const char *target,
     if (s_pfn == NULL) {
         s_pfn = dlsym(RTLD_NEXT, "mount");
         if (s_pfn == NULL) {
-            printf("dlsym returns NULL for 'mount'!\n");
+            printf("[libhacks.so] dlsym returns NULL for 'mount'!\n");
             return -1;
         }
     }
 
-    printf("mount(source=%s, target=%s, filesystemtype=%s)\n", source, target, filesystemtype);
+    printf("[libhacks.so] mount(source=%s, target=%s, filesystemtype=%s)\n", source, target, filesystemtype);
     if (strcmp(target, "/media/mmc") == 0) {
-        printf("/media/mmc mount detected, returning success\n");
+        printf("[libhacks.so] /media/mmc mount detected, returning success\n");
         return 0;
     } else {
         return s_pfn(source, target, filesystemtype, mountflags, data);
@@ -34,7 +34,7 @@ int mount(const char *source, const char *target,
 }
 
 int umount(const char *target) {
-        printf("umount called for %s. Ignore.\n", target);
+        printf("[libhacks.so] umount called for %s. Ignore.\n", target);
         return 0;
 }
 
@@ -45,12 +45,12 @@ int statfs(const char *path, struct statfs *buf) {
     if (s_pfn == NULL) {
         s_pfn = dlsym(RTLD_NEXT, "statfs");
         if (s_pfn == NULL) {
-            printf("dlsym returns NULL for 'statfs'!\n");
+            printf("[libhacks.so] dlsym returns NULL for 'statfs'!\n");
             return -1;
         }
     }
 
-    printf("statfs(path=%s, buf=%p)\n", path, buf);
+    printf("[libhacks.so] statfs(path=%s, buf=%p)\n", path, buf);
     int ret = s_pfn(path, buf);
     if (strncmp(path, "/media/mmc", strlen("/media/mmc")) != 0) {
         return ret;
@@ -62,7 +62,7 @@ int statfs(const char *path, struct statfs *buf) {
     }
 
     printf(
-        "statfs('/media/mmc'), orignal return values: "
+        "[libhacks.so] statfs('/media/mmc'), orignal return values: "
         "f_type=%0lX, f_bsize=%lX, f_bfree=%lX, "
         "f_bavail=%lX, f_blocks=%lX\n",
         buf->f_type, buf->f_bsize, buf->f_bfree,
@@ -91,7 +91,7 @@ int statfs(const char *path, struct statfs *buf) {
     }
 
     printf(
-        "statfs('/media/mmc'), modified return values: "
+        "[libhacks.so] statfs('/media/mmc'), modified return values: "
         "f_type=%lX, f_bsize=%lX, f_bfree=%lX, "
         "f_bavail=%lX, f_blocks=%lX\n",
         buf->f_type, buf->f_bsize, buf->f_bfree,
