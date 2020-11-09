@@ -125,7 +125,9 @@ do
     sleep 10
 done
 
-$WYZEHACK_DIR/playwav.sh /usr/share/notify/CN/user_need_check.wav 80
+if [ ! -z "$NOTIFICATION_VOLUME" ];then
+    $WYZEHACK_DIR/playwav.sh /usr/share/notify/CN/user_need_check.wav $NOTIFICATION_VOLUME
+fi
 
 # This will make the log sync flush logs
 killall sleep

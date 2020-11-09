@@ -10,6 +10,10 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.4.03:
+* Adding notification volume control.
+* Reducing the emulated SD card to 128GB to avoid issues.
+
 ## 0.4.02:
 * Adding an option to prevent wifi disconnecting.
 * Integrating TOTP based 2FA.
