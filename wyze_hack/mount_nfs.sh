@@ -99,16 +99,12 @@ if [ "$PING_KEEPALIVE" == "1" ];then
     ping $GATEWAY_IP 2>&1 >/dev/null &
 fi
 
-# For debugging purpose, copy unknown app_init.sh to init folder in git repo
-DEV_INIT=/mnt/WyzeCams/.init
-if [ -d $DEV_INIT ]; then
-    if [ ! -f $WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh ]; then
-        if [ ! -d $DEV_INIT/$WYZEINIT_MD5 ]; then
-            mkdir -p $DEV_INIT/$WYZEINIT_MD5
-            cp /system/init/app_init_orig.sh $DEV_INIT/$WYZEINIT_MD5/
-        fi
-        touch $DEV_INIT/$WYZEINIT_MD5/$WYZEAPP_VER
-    fi
+# Custom script
+if [ -f "$CUSTOM_SCRIPT" ]; then
+    echo "Starting custom script: $CUSTOM_SCRIPT"
+    $CUSTOM_SCRIPT &
+else
+    echo "Custom script not found: $CUSTOM_SCRIPT"
 fi
 
 # Detecting NFS share mount failure

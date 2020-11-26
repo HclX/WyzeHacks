@@ -35,6 +35,14 @@ export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 # value should be in range of 0 and 100
 # export NOTIFICATION_VOLUME=80
 
+# Uncomment and update this to run a custom script after the NFS mount finishes.
+# The script must already exists and executable. You can always use "/media/mmc"
+# to refer the camera folder on the NFS share. Or use "/mnt" to refer the root
+# of NFS share. The value of the variable can only contain script file name, no
+# command line arguments. The script will be executed in background.
+# export CUSTOM_SCRIPT=/media/mmc/scripts/myscript.sh
+# export CUSTOM_SCRIPT=/mnt/WyzeCams/scripts/myscript.sh
+
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
 # generate your own password hash, use the following command from a
