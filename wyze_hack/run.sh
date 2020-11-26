@@ -3,17 +3,9 @@ export WYZEHACK_MD5=$THIS_MD5
 export WYZEHACK_DIR=$THIS_DIR
 export WYZEHACK_VER=$THIS_VER
 
-# Version check
-WYZEAPP_VER="UNKNOWN"
-source $WYZEHACK_DIR/app_ver.inc
-
-echo "WyzeApp version:  $WYZEAPP_VER"
-echo "WyzeHack version: $WYZEHACK_VER"
-
 # User configuration
 if [ -f $WYZEHACK_CFG ];
 then
-
     source $WYZEHACK_CFG
     export PATH=$WYZEHACK_DIR/bin:$PATH
 else
@@ -21,9 +13,28 @@ else
     export PASSWD_SHADOW='root::10933:0:99999:7:::'
 fi
 
+# Log syncing
 if [ ! -z "$SYNC_BOOT_LOG" ];
 then
     exec 2>&1 >> /tmp/boot.log
+fi
+
+# Version check
+WYZEAPP_VER="UNKNOWN"
+source $WYZEHACK_DIR/app_ver.inc
+export WYZEAPP_VER
+export WYZEINIT_MD5=`md5sum /system/init/app_init_orig.sh | grep -oE "^[0-9a-f]*"`
+
+echo "WyzeApp version:  $WYZEAPP_VER"
+echo "WyzeHack version: $WYZEHACK_VER"
+echo "app_init signature: $WYZEINIT_MD5"
+
+INIT_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
+
+if [ ! -f "$INIT_SCRIPT" ];
+then
+    echo "Unknown app_init.sh signature:$WYZEINIT_MD5"
+    INIT_SCRIPT="$WYZEHACK_DIR/init/unknown/init.sh"
 fi
 
 # Special handling for updates
@@ -38,4 +49,5 @@ then
     $WYZEHACK_DIR/mount_nfs.sh & 
 fi
 
-LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so /system/init/app_init_orig.sh
+# Load init script for the current firmware version
+source $INIT_SCRIPT

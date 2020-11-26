@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.4.04:
+* Adding support for latest firmware (4.9.6.218, 4.10.6.218)
+
 ## 0.4.03:
 * Adding notification volume control.
 * Reducing the emulated SD card to 128GB to avoid issues.
