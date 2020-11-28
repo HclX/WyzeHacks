@@ -13,6 +13,7 @@ functions:
 ## 0.4.04:
 * Adding support for latest firmware (4.9.6.218, 4.10.6.218).
 * Adding support of custom script.
+* Adding support for automatic config and wyzehack update.
 
 ## 0.4.03:
 * Adding notification volume control.

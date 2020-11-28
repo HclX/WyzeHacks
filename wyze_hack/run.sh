@@ -19,6 +19,11 @@ then
     exec 2>&1 >> /tmp/boot.log
 fi
 
+# Find out device MAC address
+DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g'`
+export DEVICE_ID
+echo "Device ID: $DEVICE_ID"
+
 # Version check
 WYZEAPP_VER="UNKNOWN"
 source $WYZEHACK_DIR/app_ver.inc

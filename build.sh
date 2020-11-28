@@ -27,11 +27,11 @@ md5=$MD5
 EOL
 
 zip -r -j ./release/wyze_hacks_$RELEASE.zip ./installer -x *.inc *.tokens @
-rm -rf ./release/$RELEASE
 
-unzip -q ./release/wyze_hacks_$RELEASE.zip -d ./release/$RELEASE
+rm -rf ./release/release_$RELEASE
+unzip -q ./release/wyze_hacks_$RELEASE.zip -d ./release/release_$RELEASE
 if [ -f ./installer/config.inc ];then
-    cp ./installer/config.inc ./release/$RELEASE
+    cp ./installer/config.inc ./release/release_$RELEASE
 fi
 
 echo "Release $WYZEHACK_VER build finished."

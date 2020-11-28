@@ -5,14 +5,13 @@ then
     exit 1
 fi
 
-NFS_MOUNT="/bin/mount $NFS_OPTIONS"
-
-DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g'`
 if [ -z "$DEVICE_ID" ];
 then
     echo "Device ID not found in /params/config/.product_config!"
     exit 1
 fi
+
+NFS_MOUNT="/bin/mount $NFS_OPTIONS"
 
 while true
 do
@@ -87,6 +86,11 @@ do
 
     break
 done
+
+# Keep a copy of config.inc in <cam_dir>/wyzehacks directory, this allows user
+# to verify their current config and updating it by editing this file.
+mkdir -p /media/mmc/wyzehacks
+cp $WYZEHACK_CFG /media/mmc/wyzehacks/config.inc
 
 $WYZEHACK_DIR/log_sync.sh &
 $WYZEHACK_DIR/auto_reboot.sh &

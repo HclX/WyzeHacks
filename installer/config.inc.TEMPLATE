@@ -35,6 +35,25 @@ export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 # value should be in range of 0 and 100
 # export NOTIFICATION_VOLUME=80
 
+# Uncomment this to enable automatically updating config.inc file based on the
+# file in <camera_folder>/wyzehacks/config.inc when the device is rebooting.
+# export AUTO_CONFIG=1
+
+# Uncomment this to enable automatically updating wyzehacks. To update, you need
+# to extract the latest wyzehacks release archive to $UPDATE_DIR and name it as
+# "release_?_?_??" and then reboot the camera. The updating script will search
+# for latest version based on the folder name.
+# export AUTO_UPDATE=1
+
+# By default, variable "UPDATE_DIR" is set to "/mnt/WyzeCams/wyzehacks", which
+# is <NFS_ROOT>/WyzeCams/wyzehacks. If auto update is enabled, it will search
+# for updates in this directory. The default value allows all cameras share the
+# same update. You can customize this directory for a specific camera if you
+# want it to use different update (for example, testing dev builds). Some thing
+# under "/media/mmc" would be a good candidate because it maps to the camera
+# folder.
+# export UPDATE_DIR=/media/mmc/wyzehacks
+
 # Uncomment and update this to run a custom script after the NFS mount finishes.
 # The script must already exists and executable. You can always use "/media/mmc"
 # to refer the camera folder on the NFS share. Or use "/mnt" to refer the root
