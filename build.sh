@@ -13,6 +13,7 @@ mkdir -p .tmp/Upgrade
 echo FWGRADEUP=app > .tmp/Upgrade/PARA
 sed "s/__WYZEHACK_VER__/$WYZEHACK_VER/g" ./wyze_hack/stub.sh > .tmp/Upgrade/wyze_hack.sh
 tar --sort=name --owner=root:0 --group=root:0 --mtime='1970-01-01' --dereference -cz -O wyze_hack >>.tmp/Upgrade/wyze_hack.sh
+chmod a+x .tmp/Upgrade/wyze_hack.sh
 cp ./wyze_hack/upgraderun.sh .tmp/Upgrade/
 tar --sort=name --owner=root:0 --group=root:0 --mtime='1970-01-01' --dereference -cf ./installer/FIRMWARE_660R.bin -C ./.tmp Upgrade
 rm -rf .tmp
