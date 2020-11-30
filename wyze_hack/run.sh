@@ -24,6 +24,12 @@ DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config
 export DEVICE_ID
 echo "Device ID: $DEVICE_ID"
 
+# Set hostname
+if [ -z "$HOSTNAME" ];then
+    HOSTNAME="WyzeCam-"`echo -n $DEVICE_ID | tail -c 4`
+fi
+hostname $HOSTNAME
+
 # Version check
 WYZEAPP_VER="UNKNOWN"
 source $WYZEHACK_DIR/app_ver.inc

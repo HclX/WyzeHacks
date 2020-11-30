@@ -1,6 +1,6 @@
 # WyzeHacks
-This project contains a set of scripts trying to provide additional features not
-implemented by the official firmware. Currently, it provides the following
+This project contains a set of scripts trying to provide additional features
+not implemented by the official firmware. Currently, it provides the following
 functions:
 1. Enable telnetd on your camera.
 2. Customize the default root password for telnet login.
@@ -14,6 +14,14 @@ functions:
 * Adding support for latest firmware (4.9.6.218, 4.10.6.218).
 * Adding support of custom script.
 * Adding support for automatic config and wyzehack update.
+* Adding support of customized hostname.
+
+Note: Wyze made some changes in version 4.x.6.218 cuasing it really hard to
+install wyze hacks non-intrusively. So I have to make some version specific
+changes, and there may be more version specific changes coming later if they
+changed it again. This means we may need more frequently releases than before
+(worst case for every stable firmware). This is why I added auto-update
+mechanism in this release to make my (and others) lives easier in future.
 
 ## 0.4.03:
 * Adding notification volume control.
@@ -107,6 +115,12 @@ camera.
 4. The device should reboot by itself in less than a minute and you should have
 the latest hack installed.
 
+### Automatically install a release on NFS share
+In version 0.4.04 I added the "auto-update" mechanism allowing the camera to
+automatically install a release from NFS share. This feature is by default
+disabled so you have to manually enable it. Please check the config.inc.TEMPLATE
+on how to use it.
+
 # Features:
 ## NFS share naming:
   The per camera NFS share was named by the camera's MAC address, but it's very
@@ -161,8 +175,8 @@ operations should be limitted to the specific directory mapped for a particular
 camera, but I wouldn't rely on that. It's always good to setup a separate NFS
 share just for this purpose and isolate it from all your other important 
 documents.
-* This tested working on latest firmware (4.9.6.156/4.10.6.156) and I didn't
-bother doing full tests on older firmwares.
+* It is usually tested working on latest stable firmware and I don't have time
+to do full testing for every older versions.
 * Once installed, physical SD card will no longer be recognized by the camera.
 * The log file contains sensitive account information, so do not share with 
 others unless you don't mind your account being compromised.
@@ -196,12 +210,12 @@ failing. The most likely failure reason would be missing configuration file.
 Depending on how you install, you need to put the config.inc file to the right
 location for the installer to pickup.
 
-## My NFS share has more than 1TB space, why does it say only 512GB in the app?
+## My NFS share has more than 1TB space, why does it say only 128GB in the app?
 The firwmare is designed to handle SD card, which usually has a much smaller
 size. With large size like this, the firmware will behave incorrectly. To avoid
 issues, the hack limits the emulated SD card to maximum 512GB. If your NFS share
 has more than 16GB free space, you will see an SD card with the size set to your
-available free space (capped to 512GB). If your share has a free space lower
+available free space (capped to 128). If your share has a free space lower
 than 16GB, the device will see a 16GB SD card, with free space set to your
 actual free space.
 

@@ -3,8 +3,8 @@
 # with name "config.inc" when installing the hack.
 
 # You need to modify NFS_ROOT to point to your NFS share. The recordings
-# will be stored under $NFS_ROOT/WyzeCams/<MAC_ADDR_OF_YOUR_CAMERA>/.
-export NFS_ROOT='192.168.1.10:/volume1/'
+# will be stored under $NFS_ROOT/WyzeCams/<MAC_ADDR_OF_YOUR_CAMERA>.
+export NFS_ROOT='192.168.1.10:/volume1'
 
 # Some NFS configurations may need special mount options. You can specify
 # them here. The default value is verified on my camera with a NFS v3 share
@@ -35,6 +35,10 @@ export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 # value should be in range of 0 and 100
 # export NOTIFICATION_VOLUME=80
 
+# Uncomment and update this value to customize the hostname of the camera. By
+# default it will be set to <WyzeCam>-<last 4 hex digits of the mac>.
+# export HOSTNAME='<hostname>'
+
 # Uncomment this to enable automatically updating config.inc file based on the
 # file in <camera_folder>/wyzehacks/config.inc when the device is rebooting.
 # export AUTO_CONFIG=1
@@ -52,15 +56,15 @@ export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 # want it to use different update (for example, testing dev builds). Some thing
 # under "/media/mmc" would be a good candidate because it maps to the camera
 # folder.
-# export UPDATE_DIR=/media/mmc/wyzehacks
+# export UPDATE_DIR='/media/mmc/wyzehacks'
 
 # Uncomment and update this to run a custom script after the NFS mount finishes.
 # The script must already exists and executable. You can always use "/media/mmc"
 # to refer the camera folder on the NFS share. Or use "/mnt" to refer the root
 # of NFS share. The value of the variable can only contain script file name, no
 # command line arguments. The script will be executed in background.
-# export CUSTOM_SCRIPT=/media/mmc/scripts/myscript.sh
-# export CUSTOM_SCRIPT=/mnt/WyzeCams/scripts/myscript.sh
+# export CUSTOM_SCRIPT='/media/mmc/scripts/myscript.sh'
+# export CUSTOM_SCRIPT='/mnt/WyzeCams/scripts/myscript.sh'
 
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
