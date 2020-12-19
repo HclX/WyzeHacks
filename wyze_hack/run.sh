@@ -8,6 +8,7 @@ if [ -f $WYZEHACK_CFG ];
 then
     source $WYZEHACK_CFG
     export PATH=$WYZEHACK_DIR/bin:$PATH
+    export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
 else
     echo "Config file not found, clearing telnet password"
     export PASSWD_SHADOW='root::10933:0:99999:7:::'
@@ -19,11 +20,6 @@ then
     exec 2>&1 >> /tmp/boot.log
 fi
 
-# Find out device MAC address
-DEVICE_ID=`grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g'`
-export DEVICE_ID
-echo "Device ID: $DEVICE_ID"
-
 # Set hostname
 if [ -z "$HOSTNAME" ];then
     HOSTNAME="WyzeCam-"`echo -n $DEVICE_ID | tail -c 4`
@@ -34,7 +30,12 @@ hostname $HOSTNAME
 WYZEAPP_VER="UNKNOWN"
 source $WYZEHACK_DIR/app_ver.inc
 export WYZEAPP_VER
-export WYZEINIT_MD5=`md5sum /system/init/app_init_orig.sh | grep -oE "^[0-9a-f]*"`
+
+if [ "$DEVICE_MODEL" == "v2" ];then
+    export WYZEINIT_MD5=`md5sum /system/init/app_init_orig.sh | grep -oE "^[0-9a-f]*"`
+else
+    export WYZEINIT_MD5=`md5sum /system/init/app_init.sh | grep -oE "^[0-9a-f]*"`
+fi
 
 echo "WyzeApp version:  $WYZEAPP_VER"
 echo "WyzeHack version: $WYZEHACK_VER"

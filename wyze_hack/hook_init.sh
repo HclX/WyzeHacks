@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ "$DEVICE_MODEL" == "v3" ];then
+    exit 0
+fi
+
 SYSTEM_DIR=$1
 if [ -z "$SYSTEM_DIR" ];
 then

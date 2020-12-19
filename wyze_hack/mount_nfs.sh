@@ -11,8 +11,11 @@ then
     exit 1
 fi
 
-NFS_MOUNT="/bin/mount $NFS_OPTIONS"
+# MMC detection GPIO number is 50
+echo 1 > $WYZEHACK_DIR/mmc_gpio_value.txt
+$WYZEHACK_DIR/bin/hackutils init 50
 
+NFS_MOUNT="/bin/mount $NFS_OPTIONS"
 while true
 do
     sleep 10
@@ -79,11 +82,8 @@ do
     ifconfig > /media/mmcblk0p1/ifconfig.txt 2>&1
 
     echo "Notifying iCamera about SD card insertion event..."
-    $WYZEHACK_DIR/bin/uevent_send "add@/devices/platform/jzmmc_v1.2.0/mmc_host/mmc0/mmc0:e624/block/mmcblk0/mmcblk0p1"
-    touch /dev/mmcblk0
-    touch /dev/mmcblk0p1
-    insmod $WYZEHACK_DIR/bin/dummy_mmc.ko
-
+    echo 0 > $WYZEHACK_DIR/mmc_gpio_value.txt
+    $WYZEHACK_DIR/bin/hackutils mmc_insert
     break
 done
 

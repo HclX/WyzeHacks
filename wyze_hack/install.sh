@@ -31,7 +31,6 @@ fi
 
 # Always try to enable telnetd
 echo "Enabling telnetd..."
-echo 1>/configs/.Server_config
 telnetd
 
 # Swapping shadow file so we can telnetd in without password. This

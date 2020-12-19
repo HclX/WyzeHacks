@@ -1,6 +1,6 @@
 .PHONY: driver utils clean clean_all
 
-all: driver utils
+all: utils
 
 driver: | .tmp/.toolchain .tmp/.kernel
 	make -C dummymmc CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu- KDIR=$(CURDIR)/.tmp/kernel-master
@@ -9,7 +9,7 @@ utils: | .tmp/.toolchain
 	make -C utils CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu-
 
 clean:
-	make -C dummymmc clean CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu- KDIR=$(CURDIR)/.tmp/kernel-master
+#	make -C dummymmc clean CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu- KDIR=$(CURDIR)/.tmp/kernel-master
 	make -C utils clean CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu-
 
 clean_all: |clean

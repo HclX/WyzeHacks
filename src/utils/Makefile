@@ -7,12 +7,13 @@ CFLAGS = $(INCLUDES) -O2 -Wall -march=mips32r2 -muclibc -std=c99
 LDFLAG = -muclibc -Wl,-gc-sections
 
 
-all: uevent_send uevent_recv libhacks.so
+all: libhacks.so hackutils
 
 clean:
-	@rm -rf *.o uevent_send uevent_recv libhacks.so
+	@rm -rf *.o libhacks.so hackutils
 
 libhacks.so: libhacks.c
 	$(CC) $(CFLAGS) --shared -fPIC -ldl $^ -o $@
 
-
+hackutils: hackutils.c
+	$(CC) $(CFLAGS) -L. -Wl,-rpath='$$ORIGIN' -lhacks $^ -o $@

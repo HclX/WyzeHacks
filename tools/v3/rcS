@@ -43,8 +43,8 @@ mount -t squashfs /dev/mtdblock3 /system
 mount -t jffs2 /dev/mtdblock6 /configs
 
 # Run init script
-if [ -f /configs/wyzehacks.sh ]; then
-    /configs/wyzehacks.sh &
+if [ -f /configs/wyze_hack.sh ]; then
+    /configs/wyze_hack.sh &
 elif [ -f /system/init/app_init.sh ]; then
     /system/init/app_init.sh &
 fi
