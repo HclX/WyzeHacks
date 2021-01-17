@@ -464,7 +464,7 @@ cmd_run() {
     export PATH=$WYZEHACK_DIR/bin:$PATH
     export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
     echo 1 > $WYZEHACK_DIR/mmc_gpio_value.txt
-    $WYZEHACK_DIR/bin/hackutils init $MMC_GPIO
+    $WYZEHACK_DIR/bin/hackutils init
 
     local INIT_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
     if [ ! -f "$INIT_SCRIPT" ];

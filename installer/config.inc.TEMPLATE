@@ -13,7 +13,7 @@ export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 
 # Uncomment and modify the AUTO_REBOOT variable to automatically reboot
 # the camera at a specific minute. Time is specified in "HH:MM" format
-# in UTC time.
+# in local time.
 # export REBOOT_AT='13:16'
 
 # Uncomment and modify the ARCHIVE_OLDER_THAN variable to automatically
@@ -39,14 +39,14 @@ export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 # default it will be set to <WyzeCam>-<last 4 hex digits of the mac>.
 # export HOSTNAME='<hostname>'
 
-# Uncomment this to enable automatically updating config.inc file based on the
-# file in <camera_folder>/wyzehacks/config.inc when the device is rebooting.
+# Uncomment this to enable automatically updating config.inc file based on file
+# <camera_folder>/wyzehacks/config.new. This will be checked every one minute.
 # export AUTO_CONFIG=1
 
 # Uncomment this to enable automatically updating wyzehacks. To update, you need
 # to extract the latest wyzehacks release archive to $UPDATE_DIR and name it as
-# "release_?_?_??" and then reboot the camera. The updating script will search
-# for latest version based on the folder name.
+# "release_?_?_??". The updating script will search for latest version based on
+# the folder name every one minute.
 # export AUTO_UPDATE=1
 
 # By default, variable "UPDATE_DIR" is set to "/mnt/WyzeCams/wyzehacks", which

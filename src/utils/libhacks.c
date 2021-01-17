@@ -28,7 +28,8 @@
 typedef struct {
     uint32_t    magic;
     uint32_t    nfs_mounted;
-    char        mmc_gpio_path[MAX_PATH];
+    char        mmc_gpio_path_orig[MAX_PATH];
+    char        mmc_gpio_path_redir[MAX_PATH];
 } hackdata_t;
 
 hackdata_t*     g_hackdata;
@@ -161,23 +162,32 @@ int open(char * file, int oflag) {
     typedef int (*PFN_open)(const char*, int);
     DLSYM(open);
 
-    if (strcmp(file, g_hackdata->mmc_gpio_path) == 0) {
+    if (strcmp(file, g_hackdata->mmc_gpio_path_orig) == 0) {
         // TODO: Replace hardcoded wyzehack path
-        return s_pfn("/tmp/run/wyze_hack/mmc_gpio_value.txt", oflag);
+        return s_pfn(g_hackdata->mmc_gpio_path_redir, oflag);
     } else {
         return s_pfn(file, oflag);
     }
 }
 
-int hack_init(int mmc_gpio_num) {
+int hack_init() {
     if (g_hackdata->magic != HACKDATA_MAGIC) {
         return -1;
     }
 
     snprintf(
-        g_hackdata->mmc_gpio_path,
-        sizeof(g_hackdata->mmc_gpio_path),
-        "/sys/class/gpio/gpio%d/value", mmc_gpio_num);
+        g_hackdata->mmc_gpio_path_orig,
+        sizeof(g_hackdata->mmc_gpio_path_orig),
+        "/sys/class/gpio/gpio%s/value", getenv("MMC_GPIO"));
+
+    snprintf(
+        g_hackdata->mmc_gpio_path_redir,
+        sizeof(g_hackdata->mmc_gpio_path_redir),
+        "%s/mmc_gpio_value.txt", getenv("WYZEHACK_DIR"));
+
+    printf(
+        "Access to %s will be redirected to %s\n",
+        g_hackdata->mmc_gpio_path_orig, g_hackdata->mmc_gpio_path_redir);
 
     return 0;
 }

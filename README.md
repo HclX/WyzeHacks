@@ -10,6 +10,15 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.01:
+* Fixing config update mechanism.
+* Changing auto reboot to use local time.
+* Moving logs to a different directory
+* Supporting telnet without NFS mount.
+* Refreshing ifconfig.txt every minute.
+* Removing dummymmc kernel module and uevent_recv/uevent_send binaries.
+* WIP v3 camera support.
+
 ## 0.4.04:
 * Adding support for latest firmware (4.9.6.218, 4.10.6.218).
 * Adding support of custom script.
