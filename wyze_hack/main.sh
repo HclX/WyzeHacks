@@ -66,9 +66,9 @@ if [ -z "$NFS_ROOT" ]; then
 fi
 
 play_sound() {
-    echo "WyzeHack: 1">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
+    echo 1>/sys/class/gpio/gpio${SPEAKER_GPIO}/value
     $WYZEHACK_DIR/bin/audioplay $@ 1>/dev/null 2>&1
-    echo "WyzeHack: 0">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
+    echo 0>/sys/class/gpio/gpio${SPEAKER_GPIO}/value
 }
 
 set_passwd() {
@@ -267,6 +267,23 @@ check_reboot() {
     fi
 }
 
+check_uninstall() {
+    if [ -f /media/mmc/wyzehacks/uninstall ]; then
+        echo "WyzeHack: Uninstalling wyze hacks..."
+        rm -f /media/mmc/wyzehacks/uninstall
+        if cp $WYZEINIT_SCRIPT /system/init/app_init.sh;
+        then
+            rm -f $WYZEHACK_BIN
+            rm -f $WYZEHACK_CFG
+            echo "Uninstallation completed" > /media/mmc/wyzehacks/uninstall.done
+            return 1
+        else
+            echo "Uninstallation failed" > /media/mmc/wyzehacks/uninstall.failed
+        fi
+    fi
+    return 0
+}
+
 mount_nfs() {
     local NFS_MOUNT="/bin/mount $NFS_OPTIONS"
     while true
@@ -388,6 +405,10 @@ sys_monitor() {
         if [ ! -z "$REBOOT_AT" ]; then
             check_reboot
             let REBOOT_FLAG=$REBOOT_FLAG+$?
+        fi
+
+        if ! check_uninstall; then
+            let REBOOT_FLAG=$REBOOT_FLAG+1
         fi
 
         if [ ! -z "$NFS_MOUNTED" ]; then

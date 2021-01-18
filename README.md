@@ -11,13 +11,17 @@ functions:
 
 # Release notes
 ## 0.5.01:
+* Auto update and auto config are now checked every minute.
 * Fixing config update mechanism.
 * Changing auto reboot to use local time.
 * Moving logs to a different directory
 * Supporting telnet without NFS mount.
 * Refreshing ifconfig.txt every minute.
+* Better method for SD card insertion simulation.
 * Removing dummymmc kernel module and uevent_recv/uevent_send binaries.
-* WIP v3 camera support.
+* Adding uninstallation method
+* Work-in-progress v3 camera support (require special steps).
+* Tested on firmware 4.9.6.224 (V2), 4.6.10.224 (PAN) and 4.36.0.228 (V3).
 
 ## 0.4.04:
 * Adding support for latest firmware (4.9.6.218, 4.10.6.218).
@@ -129,6 +133,37 @@ In version 0.4.04 I added the "auto-update" mechanism allowing the camera to
 automatically install a release from NFS share. This feature is by default
 disabled so you have to manually enable it. Please check the config.inc.TEMPLATE
 on how to use it.
+
+# Uninstalling the wyzehacks
+You can use one of the following ways to uninstall this hack:
+## Use the built-in uninstall feature
+Starting with version 0.5.01, you can tell the camera to uninstall wyzehacks by
+placing a file at the following location:
+  `<CamDir>/wyzehacks/uninstall`
+Once the uninstallation finished, you will see a file `uninstall.done`
+confirming the success of uninstallation, or a file `uninstall.failed` telling
+something went wrong with the uninstallation.
+
+## Do a manual telnet uninstall
+With wyzehacks installed, you should have the telnet access available. You can
+log into the camera and perform the following steps (for v1, v2 and PAN):
+```
+  cp /system/init/app_init_orig.sh /system/init/app_init.sh 
+  rm /params/wyze_hacks.*
+```
+Once you verified the above commands finished successfully you are no longer
+having any wyzehacks related stuff on the camera.
+
+NOTE: To telnet into the camera, you need the login with root user and its
+password, default one for v1/v2 is `ismart12`. PAN's default password is unknown
+so you will have to set your password shadow to allow you login. Check the
+`PASSWD_SHADOW` section in `config.inc.TEMPLATE` on how to do that.
+
+## Perform a SD card firmware recovery
+This removes the wyzehacks boot straping code from the camera so that it will
+not be loaded by the camera firmware. However, your configuration file remains
+on the camera. Luckily there is not much sensentive information in that file.
+
 
 # Features:
 ## NFS share naming:

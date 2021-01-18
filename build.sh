@@ -28,7 +28,7 @@ tar \
     --group=root:0 \
     --mtime='1970-01-01' \
     --dereference -cf ./installer/FIRMWARE_660R.bin -C ./.tmp Upgrade
-# rm -rf .tmp
+rm -rf .tmp
 
 MD5=`md5sum ./installer/FIRMWARE_660R.bin | grep -oE "^[0-9a-f]*"`
 
