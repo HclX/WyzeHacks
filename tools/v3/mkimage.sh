@@ -4,7 +4,7 @@ set -e
 DEMO_IN=$1
 ROOTFS_OUT=$2
 
-if [ -z "$DEMO_OUT" ];then
+if [ -z "$ROOTFS_OUT" ];then
     echo "Usage: mkimage.sh <demo.bin> <out_file>"
     exit 1
 fi
@@ -12,11 +12,6 @@ fi
 if [ ! -f "$DEMO_IN" ];then
     echo "Input file [$DEMO_IN] doesn't exist"
     exit 2
-fi
-
-if [ -f "$ROOTFS_OUT" ];then
-    echo "Output file [$ROOTFS_OUT] already exists"
-    exit 3
 fi
 
 cd $(dirname $0)
@@ -28,9 +23,9 @@ KERNEL_OFFSET=$((0x000040))
 ROOTFS_OFFSET=$((0x1F0040))
 APPFS_OFFSET=$((0x5C0040))
 
-dd if=${DEMO_IN} of=$TMP_DIR/kernel.bin skip=$KERNEL_OFFSET count=$(($ROOTFS_OFFSET-$KERNEL_OFFSET)) bs=1
+#dd if=${DEMO_IN} of=$TMP_DIR/kernel.bin skip=$KERNEL_OFFSET count=$(($ROOTFS_OFFSET-$KERNEL_OFFSET)) bs=1
 dd if=${DEMO_IN} of=$TMP_DIR/rootfs.bin skip=$ROOTFS_OFFSET count=$(($APPFS_OFFSET-$ROOTFS_OFFSET)) bs=1
-dd if=${DEMO_IN} of=$TMP_DIR/appfs.bin  skip=$APPFS_OFFSET  bs=1
+#dd if=${DEMO_IN} of=$TMP_DIR/appfs.bin  skip=$APPFS_OFFSET  bs=1
 
 unsquashfs -d $TMP_DIR/rootfs $TMP_DIR/rootfs.bin
 cp ./rcS $TMP_DIR/rootfs/etc/init.d/rcS

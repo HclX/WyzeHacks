@@ -1,3 +1,4 @@
+@eaDir
 .vscode
 release/*
 !release/*.zip

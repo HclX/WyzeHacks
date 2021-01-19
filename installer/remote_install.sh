@@ -17,4 +17,4 @@ fi
 
 python3 -m pip install requests
 python3 ./wyze_updater.py --token ~/.wyze_token $DEBUG update \
-    -m WYZEC1-JZ -m WYZECP1_JEF -f ./firmware.bin -p 11808
+    -m WYZEC1-JZ -m WYZECP1_JEF -m WYZE_CAKP2JFUS -f ./firmware.bin -p 11808
