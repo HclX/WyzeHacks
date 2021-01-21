@@ -352,7 +352,7 @@ mount_nfs() {
     done
 
     echo "WyzeHack: Notifying iCamera about SD card insertion event..."
-    echo 0 > $WYZEHACK_DIR/mmc_gpio_value.txt
+    echo "0" > $WYZEHACK_DIR/mmc_gpio_value.txt
     $WYZEHACK_DIR/bin/hackutils mmc_insert
 
     # Mark this directory for this camera
@@ -495,21 +495,21 @@ cmd_run() {
         # MMC detection hook init
         export PATH=$WYZEHACK_DIR/bin:$PATH
         export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
-        echo 1 > $WYZEHACK_DIR/mmc_gpio_value.txt
+        echo "1" > $WYZEHACK_DIR/mmc_gpio_value.txt
         $WYZEHACK_DIR/bin/hackutils init
 
         export WYZEINIT_MD5=$(md5sum $WYZEINIT_SCRIPT| grep -oE "^[0-9a-f]*")
         echo "WyzeHack: app_init signature: $WYZEINIT_MD5"
 
-        local INIT_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
-        if [ ! -f "$INIT_SCRIPT" ];
+        local LOADER_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
+        if [ ! -f "$LOADER_SCRIPT" ];
         then
             echo "WyzeHack: Unknown app_init.sh signature:$WYZEINIT_MD5"
-            INIT_SCRIPT="$WYZEHACK_DIR/init/unknown/init.sh"
+            LOADER_SCRIPT="$WYZEHACK_DIR/init/unknown/init.sh"
         fi
 
         # Load init script for the current firmware version
-        $INIT_SCRIPT &
+        source $LOADER_SCRIPT
     fi
 
     # Wait until WIFI is connected
