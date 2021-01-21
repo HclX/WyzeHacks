@@ -3,12 +3,18 @@
 
 export WYZEHACK_DIR=$(dirname $(readlink -f $0))
 export WYZEAPP_VER=$(grep -i AppVer /system/bin/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
+export WYZEHACK_CFG=/configs/wyze_hack.cfg
+export WYZEHACK_BIN=/configs/wyze_hack.sh
+
+if grep "wyze_hack.sh" /etc/init.d/rcS; then
+    export WYZEINIT_SCRIPT=/system/init/app_init.sh
+else
+    export WYZEINIT_SCRIPT=/system/init/app_init_orig.sh
+fi
 
 case $WYZEAPP_VER in
 3.9.*)
-    export WYZEHACK_CFG=/params/wyze_hack.cfg
-    export WYZEHACK_BIN=/params/wyze_hack.sh
-    export WYZEINIT_SCRIPT=/system/init/app_init_orig.sh
+    # Cam V1
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="V1"
     export SPEAKER_GPIO=63
@@ -16,9 +22,7 @@ case $WYZEAPP_VER in
     ;;
 
 4.9.*)
-    export WYZEHACK_CFG=/params/wyze_hack.cfg
-    export WYZEHACK_BIN=/params/wyze_hack.sh
-    export WYZEINIT_SCRIPT=/system/init/app_init_orig.sh
+    # Cam V2
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="V2"
     export SPEAKER_GPIO=63
@@ -26,19 +30,23 @@ case $WYZEAPP_VER in
     ;;
 
 4.10.*)
-    export WYZEHACK_CFG=/params/wyze_hack.cfg
-    export WYZEHACK_BIN=/params/wyze_hack.sh
-    export WYZEINIT_SCRIPT=/system/init/app_init_orig.sh
+    # Cam PAN
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="PAN"
     export SPEAKER_GPIO=63
     export MMC_GPIO=50
     ;;
 
+4.25.*)
+    # Doorbell
+    export DEVICE_ID=$(grep -E -o CONFIG_INFO=[0-9A-F]+ /params/config/.product_config | cut -c 13-24)
+    export DEVICE_MODEL="DB"
+    export SPEAKER_GPIO=63
+    export MMC_GPIO=50
+    ;;
+
 4.36.*)
-    export WYZEHACK_CFG=/configs/wyze_hack.cfg
-    export WYZEHACK_BIN=/configs/wyze_hack.sh
-    export WYZEINIT_SCRIPT=/system/init/app_init.sh
+    # Cam V3
     export DEVICE_ID=$(grep -E -o CONFIG_INFO=[0-9A-F]+ /configs/.product_config | cut -c 13-24)
     export DEVICE_MODEL="V3"
     export SPEAKER_GPIO=63
@@ -46,6 +54,7 @@ case $WYZEAPP_VER in
     ;;
 
 *)
+    # Unknown
     export WYZEINIT_SCRIPT=/system/init/app_init.sh
     ;;
 esac
@@ -66,9 +75,9 @@ if [ -z "$NFS_ROOT" ]; then
 fi
 
 play_sound() {
-    echo 1>/sys/class/gpio/gpio${SPEAKER_GPIO}/value
+    echo "1">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
     $WYZEHACK_DIR/bin/audioplay $@ 1>/dev/null 2>&1
-    echo 0>/sys/class/gpio/gpio${SPEAKER_GPIO}/value
+    echo "0">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
 }
 
 set_passwd() {
@@ -93,7 +102,7 @@ wait_wlan() {
 }
 
 hook_init() {
-    if [ "$DEVICE_MODEL" = "V3" ];then
+    if grep "wyze_hack.sh" /etc/init.d/rcS; then
         return 0
     fi
 
@@ -472,30 +481,36 @@ cmd_run() {
         set_passwd $PASSWD_SHADOW
     fi
 
-    export WYZEINIT_MD5=$(md5sum $WYZEINIT_SCRIPT| grep -oE "^[0-9a-f]*")
-
     echo "WyzeHack: WyzeApp version:  $WYZEAPP_VER"
     echo "WyzeHack: WyzeHack version: $WYZEHACK_VER"
-    echo "WyzeHack: app_init signature: $WYZEINIT_MD5"
 
     # Set hostname
     hostname ${HOSTNAME:-"WyzeCam-$(echo -n $DEVICE_ID | tail -c 4)"}
 
-    # MMC detection hook init
-    export PATH=$WYZEHACK_DIR/bin:$PATH
-    export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
-    echo 1 > $WYZEHACK_DIR/mmc_gpio_value.txt
-    $WYZEHACK_DIR/bin/hackutils init
+    if [ -z "$NFS_ROOT" ]; then
+        # No NFS_ROOT specified, skipping all the MMC spoofing thing and run
+        # original init script
+        $WYZEINIT_SCRIPT&
+    else
+        # MMC detection hook init
+        export PATH=$WYZEHACK_DIR/bin:$PATH
+        export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
+        echo 1 > $WYZEHACK_DIR/mmc_gpio_value.txt
+        $WYZEHACK_DIR/bin/hackutils init
 
-    local INIT_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
-    if [ ! -f "$INIT_SCRIPT" ];
-    then
-        echo "WyzeHack: Unknown app_init.sh signature:$WYZEINIT_MD5"
-        INIT_SCRIPT="$WYZEHACK_DIR/init/unknown/init.sh"
+        export WYZEINIT_MD5=$(md5sum $WYZEINIT_SCRIPT| grep -oE "^[0-9a-f]*")
+        echo "WyzeHack: app_init signature: $WYZEINIT_MD5"
+
+        local INIT_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
+        if [ ! -f "$INIT_SCRIPT" ];
+        then
+            echo "WyzeHack: Unknown app_init.sh signature:$WYZEINIT_MD5"
+            INIT_SCRIPT="$WYZEHACK_DIR/init/unknown/init.sh"
+        fi
+
+        # Load init script for the current firmware version
+        $INIT_SCRIPT &
     fi
-
-    # Load init script for the current firmware version
-    $INIT_SCRIPT &
 
     # Wait until WIFI is connected
     wait_wlan
@@ -512,15 +527,18 @@ cmd_run() {
     else
         if mount_nfs; then
             NFS_MOUNTED=1
+
             # Copy some information to the NFS share
             mkdir -p /media/mmcblk0p1/wyzehacks
             cp $WYZEHACK_CFG /media/mmcblk0p1/wyzehacks/config.inc
+
+            # Initializing logging
+            log_init
         else
             echo "WyzeHack: NFS mount failed"
         fi
     fi
 
-    log_init
     # Custom script
     if [ -f "$CUSTOM_SCRIPT" ]; then
         echo "WyzeHack: Starting custom script: $CUSTOM_SCRIPT"
@@ -579,6 +597,13 @@ cmd_install() {
     echo "WyzeHack: Installing WyzeHacks version $THIS_VER"
 
     # Updating user config if exists
+    if [ -f "/params/wyze_hack.cfg" ];
+    then
+        echo "WyzeHack: Migrating from /params to /configs"
+        cp /params/wyze_hack.cfg $WYZEHACK_CFG
+        rm /params/wyze_hack.*
+    fi
+
     if [ -f /tmp/Upgrade/config.inc ];
     then
         echo "WyzeHack: Use config file /tmp/Upgrade/config.inc"

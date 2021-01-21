@@ -14,13 +14,14 @@ functions:
 * Auto update and auto config are now checked every minute.
 * Fixing config update mechanism.
 * Changing auto reboot to use local time.
-* Moving logs to a different directory
-* Supporting telnet without NFS mount.
+* Moving logs to a different directory.
+* Support telnetd and physical SD card when NFS_ROOT is not specified.
 * Refreshing ifconfig.txt every minute.
 * Better method for SD card insertion simulation.
 * Removing dummymmc kernel module and uevent_recv/uevent_send binaries.
-* Adding uninstallation method
-* Work-in-progress v3 camera support (require special steps).
+* Adding uninstallation method.
+* Moving v2 installation location from /params to /configs.
+* WIP v3 camera support (require special steps, see tools/v3/README.md).
 * Tested on firmware 4.9.6.224 (V2), 4.6.10.224 (PAN) and 4.36.0.228 (V3).
 
 ## 0.4.04:
