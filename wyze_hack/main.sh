@@ -566,7 +566,7 @@ cmd_install() {
 
     echo "WyzeHack: Starting wyze hack installer..."
 
-    play_sound $WYZEHACK_DIR/snd/begin.wav 50
+    play_sound $THIS_DIR/install_snd/begin.wav 50
 
     if [ -f $SD_DIR/debug/.copyfiles ];
     then
@@ -589,7 +589,7 @@ cmd_install() {
     if [ -z "$WYZEAPP_VER" ];
     then
         echo "WyzeHack: Wyze version not found!!!"
-        play_sound $WYZEHACK_DIR/snd/failed.wav 50
+        play_sound $THIS_DIR/install_snd/failed.wav 50
         return 1
     fi
 
@@ -604,10 +604,10 @@ cmd_install() {
         rm /params/wyze_hack.*
     fi
 
-    if [ -f /tmp/Upgrade/config.inc ];
+    if [ -f $THIS_DIR/config.inc ];
     then
-        echo "WyzeHack: Use config file /tmp/Upgrade/config.inc"
-        sed 's/\r$//' /tmp/Upgrade/config.inc > $WYZEHACK_CFG
+        echo "WyzeHack: Use config file $THIS_DIR/config.inc"
+        sed 's/\r$//' $THIS_DIR/config.inc > $WYZEHACK_CFG
     fi
 
     if [ -f "$SD_DIR/config.inc" ];
@@ -619,14 +619,14 @@ cmd_install() {
     if [ ! -f "$WYZEHACK_CFG" ];
     then
         echo "WyzeHack: Configuration file not found, aborting..."
-        play_sound $WYZEHACK_DIR/snd/failed.wav 50
+        play_sound $THIS_DIR/install_snd/failed.wav 50
         return 1
     fi
 
     if [ -z "$DEVICE_MODEL" ];
     then
         echo "WyzeHack: Unknown device model, aborting..."
-        play_sound $WYZEHACK_DIR/snd/failed.wav 50
+        play_sound $THIS_DIR/install_snd/failed.wav 50
         return 1
     fi
 
@@ -639,11 +639,11 @@ cmd_install() {
     if ! hook_init;
     then
         echo "WyzeHack: Hooking up boot script failed"
-        play_sound $WYZEHACK_DIR/snd/failed.wav 50
+        play_sound $THIS_DIR/install_snd/failed.wav 50
         return 1
     fi
 
-    play_sound $WYZEHACK_DIR/snd/finished.wav 50
+    play_sound $THIS_DIR/install_snd/finished.wav 50
 
     rm $SD_DIR/version.ini.old > /dev/null 2>&1	
     mv $SD_DIR/version.ini $SD_DIR/version.ini.old > /dev/null 2>&1

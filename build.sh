@@ -18,10 +18,20 @@ tar \
     --group=root:0 \
     --mtime='1970-01-01' \
     --dereference \
-    -cz -O -C wyze_hack . >>.tmp/Upgrade/wyze_hack.sh
+    -cz -O -C wyze_hack \
+    ./main.sh \
+    ./hack_ver.inc \
+    ./bin \
+    ./init \
+    >>.tmp/Upgrade/wyze_hack.sh
 
 chmod a+x .tmp/Upgrade/wyze_hack.sh
-cp ./wyze_hack/upgraderun.sh .tmp/Upgrade/
+cp -r \
+    ./wyze_hack/upgraderun.sh \
+    ./wyze_hack/upgrade.sh \
+    ./wyze_hack/install_snd \
+    .tmp/Upgrade/
+
 tar \
     --sort=name \
     --owner=root:0 \

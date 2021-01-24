@@ -23,6 +23,7 @@ functions:
 * Moving v2 installation location from /params to /configs.
 * WIP v3 camera support (require special steps, see tools/v3/README.md).
 * Tested on firmware 4.9.6.224 (V2), 4.6.10.224 (PAN) and 4.36.0.228 (V3).
+* Reducing wyzehack binary size by excluding some sound files.
 
 ## 0.4.04:
 * Adding support for latest firmware (4.9.6.218, 4.10.6.218).
