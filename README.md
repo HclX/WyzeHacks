@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.02:
+* Adding a "init" method for all support models to better persist the hack across updates.
+
 ## 0.5.01:
 * Auto update and auto config are now checked every minute.
 * Fixing config update mechanism.
