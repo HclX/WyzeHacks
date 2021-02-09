@@ -29,8 +29,24 @@ case $WYZEAPP_VER in
     export MMC_GPIO=50
     ;;
 
+4.28.*)
+    # Cam V2 RTSP
+    export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
+    export DEVICE_MODEL="V2"
+    export SPEAKER_GPIO=63
+    export MMC_GPIO=50
+    ;;
+
 4.10.*)
     # Cam PAN
+    export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
+    export DEVICE_MODEL="PAN"
+    export SPEAKER_GPIO=63
+    export MMC_GPIO=50
+    ;;
+
+4.29.*)
+    # Cam PAN RTSP
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="PAN"
     export SPEAKER_GPIO=63
@@ -376,9 +392,9 @@ check_nfs() {
         return 1
     fi
 
-    if ( timeout -t 5 df -h 2>&1| grep -q 'Stale NFS');
+    if ! timeout -t 20 df /media/mmcblk0p1;
     then
-        echo "WyzeHack: Stale NFS handle detected"
+        echo "WyzeHack: NFS no longer mounted as /media/mmcblk0p1"
         return 1
     fi
 
