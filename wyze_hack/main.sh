@@ -311,8 +311,15 @@ check_uninstall() {
 
 mount_nfs() {
     local NFS_MOUNT="/bin/mount $NFS_OPTIONS"
+    local RETRY_COUNT=0
     while true
     do
+        # We will try mount the NFS for 10 times, and fail if still not available
+        let RETRY_COUNT=$RETRY_COUNT+1
+        if [ $RETRY_COUNT -gt 100 ]; then
+            return 1
+        fi
+
         if ! /bin/mount | grep -q "$NFS_ROOT on /mnt";
         then
             echo "WyzeHack: $NFS_ROOT not mounted, try mounting to /mnt..."
@@ -392,7 +399,7 @@ check_nfs() {
         return 1
     fi
 
-    if ! timeout -t 20 df /media/mmcblk0p1;
+    if ! timeout -t 5 df /media/mmcblk0p1;
     then
         echo "WyzeHack: NFS no longer mounted as /media/mmcblk0p1"
         return 1
@@ -404,9 +411,9 @@ check_nfs() {
 sys_monitor() {
     while true; do
         local REBOOT_FLAG=0
-        if ! pidof telnetd; then
+        if ! pgrep -f telnetd; then
             echo "WyzeHack: Starting telnetd..."
-            telnetd
+            busybox telnetd
         fi
 
         if [ ! -z "$ARCHIVE_OLDER_THAN" ]; then
@@ -489,7 +496,7 @@ cmd_run() {
 
     # Log syncing
     if [ ! -z "$SYNC_BOOT_LOG" ]; then
-        exec 2>&1 >> /tmp/boot.log
+        exec >> /tmp/boot.log 2>&1
     fi
 
     # Customize password
@@ -538,6 +545,9 @@ cmd_run() {
         ping $GATEWAY_IP 2>&1 >/dev/null &
     fi
 
+    # Starting telnetd first
+    busybox telnetd
+
     if [ -z "$NFS_ROOT" ]; then
         echo "WyzeHack: NFS_ROOT not defined, skipping NFS mount..."
     else
@@ -551,7 +561,8 @@ cmd_run() {
             # Initializing logging
             log_init
         else
-            echo "WyzeHack: NFS mount failed"
+            echo "WyzeHack: NFS mount failed, rebooting..."
+            /sbin/reboot
         fi
     fi
 
@@ -597,7 +608,7 @@ cmd_install() {
 
     # Always try to enable telnetd
     echo "WyzeHack: Enabling telnetd..."
-    telnetd
+    busybox telnetd
 
     # Swapping shadow file so we can telnetd in without password. This
     # is for debugging purpose.
