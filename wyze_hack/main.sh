@@ -82,6 +82,11 @@ source $WYZEHACK_DIR/hack_ver.inc
 [ -f $WYZEHACK_CFG ] && source $WYZEHACK_CFG
 [ -z $WYZEHACK_DBG ] || set -x
 
+# Default values
+export NFS_TIMEOUT="${NFS_TIMEOUT:-15}"
+export NFS_OPTIONS="${NFS_OPTIONS:--o nolock,rw,noatime,nodiratime}"
+export UPDATE_DIR="${UPDATE_DIR:-/mnt/WyzeCams/wyzehacks}"
+
 # These features rely on NFS
 if [ -z "$NFS_ROOT" ]; then
     export ARCHIVE_OLDER_THAN=
@@ -256,27 +261,29 @@ check_config() {
 }
 
 check_update() {
-    local UPDATE_DIR=${UPDATE_DIR:-/mnt/WyzeCams/wyzehacks}
     echo "WyzeHack: AUTO_UPDATE enabled, checking for update in $UPDATE_DIR..."
-
-    UPDATE_DIR=$(ls -d $UPDATE_DIR/release_?_?_?? | sort -r | head -1)
-    if [ -z "$UPDATE_DIR" ]; then
+    local LATEST_UPDATE=$(ls -d $UPDATE_DIR/release_?_?_?? | sort -r | head -1)
+    if [ -z "$LATEST_UPDATE" ]; then
         echo "WyzeHack: Found no updates, skipping..."
         return 0
     fi
 
-    echo "WyzeHack: Found update $UPDATE_DIR, checking..."
-    local UPDATE_FLAG=$UPDATE_DIR/${DEVICE_ID}.done
+    echo "WyzeHack: Found update $LATEST_UPDATE, checking..."
+    local UPDATE_FLAG=$LATEST_UPDATE/${DEVICE_ID}.done
     if [ -f "$UPDATE_FLAG" ]; then
-        echo "WyzeHack: Update $UPDATE_DIR already installed, skipping..."
+        echo "WyzeHack: Update $LATEST_UPDATE already installed, skipping..."
         return 0
     fi
 
-    echo "WyzeHack: Installing update from $UPDATE_DIR..."
+    echo "WyzeHack: Installing update from $LATEST_UPDATE..."
     touch $UPDATE_FLAG
-    $UPDATE_DIR/telnet_install.sh
-    echo "WyzeHack: Update installed."
+    
+    if ! $LATEST_UPDATE/telnet_install.sh; then
+        echo "WyzeHack: Failed to install update..."
+        return 0
+    fi
 
+    echo "WyzeHack: Update installed."
     return 1
 }
 
@@ -399,7 +406,7 @@ check_nfs() {
         return 1
     fi
 
-    if ! timeout -t 5 df /media/mmcblk0p1;
+    if ! timeout -t $NFS_TIMEOUT df /media/mmcblk0p1;
     then
         echo "WyzeHack: NFS no longer mounted as /media/mmcblk0p1"
         return 1
