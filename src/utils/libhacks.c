@@ -25,11 +25,19 @@
 #define HACKDATA_MAGIC  0xDEADBEEF
 #define MAX_PATH        255
 
+#define ARRAY_SIZE(x)   sizeof(x)/sizeof(x[0])
+
+const char* const mmc_gpio_paths[] = {
+    // 4.36.0.228 and older use GPIO50 to detect MMC insertion.
+    "/sys/class/gpio/gpio50/value",
+    // 4.36.0.252 and later uses GPIO62 to detect MMC insertion.
+    "/sys/class/gpio/gpio62/value"
+};
+
 typedef struct {
     uint32_t    magic;
     uint32_t    nfs_mounted;
-    char        mmc_gpio_path_orig[MAX_PATH];
-    char        mmc_gpio_path_redir[MAX_PATH];
+    char        mmc_gpio_redir[MAX_PATH];
 } hackdata_t;
 
 hackdata_t*     g_hackdata;
@@ -162,12 +170,16 @@ int open(char * file, int oflag) {
     typedef int (*PFN_open)(const char*, int);
     DLSYM(open);
 
-    if (strcmp(file, g_hackdata->mmc_gpio_path_orig) == 0) {
-        // TODO: Replace hardcoded wyzehack path
-        return s_pfn(g_hackdata->mmc_gpio_path_redir, oflag);
-    } else {
-        return s_pfn(file, oflag);
+    if (g_hackdata->mmc_gpio_redir[0]) {
+        for (int i = 0; i < ARRAY_SIZE(mmc_gpio_paths); i ++) {
+            if (strcmp(file, mmc_gpio_paths[i]) == 0) {
+                printf("Redirecting access to %s to %s\n",
+                       file, g_hackdata->mmc_gpio_redir);
+                return s_pfn(g_hackdata->mmc_gpio_redir, oflag);
+            }
+        }
     }
+    return s_pfn(file, oflag);
 }
 
 int hack_init() {
@@ -175,20 +187,11 @@ int hack_init() {
         return -1;
     }
 
-    snprintf(
-        g_hackdata->mmc_gpio_path_orig,
-        sizeof(g_hackdata->mmc_gpio_path_orig),
-        "/sys/class/gpio/gpio%s/value", getenv("MMC_GPIO"));
-
-    snprintf(
-        g_hackdata->mmc_gpio_path_redir,
-        sizeof(g_hackdata->mmc_gpio_path_redir),
-        "%s/mmc_gpio_value.txt", getenv("WYZEHACK_DIR"));
-
-    printf(
-        "Access to %s will be redirected to %s\n",
-        g_hackdata->mmc_gpio_path_orig, g_hackdata->mmc_gpio_path_redir);
-
+    const char* p = getenv("MMC_GPIO_REDIR");
+    if (p) {
+        strncpy(g_hackdata->mmc_gpio_redir, p,
+                sizeof(g_hackdata->mmc_gpio_redir));
+    }
     return 0;
 }
 
