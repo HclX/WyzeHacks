@@ -18,7 +18,6 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="V1"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
     ;;
 
 4.9.*)
@@ -26,7 +25,6 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="V2"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
     ;;
 
 4.28.*)
@@ -34,7 +32,6 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="V2"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
     ;;
 
 4.10.*)
@@ -42,7 +39,6 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="PAN"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
     ;;
 
 4.29.*)
@@ -50,7 +46,6 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -oE "NETRELATED_MAC=[A-F0-9]{12}" /params/config/.product_config | sed 's/NETRELATED_MAC=//g')
     export DEVICE_MODEL="PAN"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
     ;;
 
 4.25.*)
@@ -58,7 +53,6 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -E -o CONFIG_INFO=[0-9A-F]+ /params/config/.product_config | cut -c 13-24)
     export DEVICE_MODEL="DB"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
     ;;
 
 4.36.*)
@@ -66,7 +60,7 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -E -o CONFIG_INFO=[0-9A-F]+ /configs/.product_config | cut -c 13-24)
     export DEVICE_MODEL="V3"
     export SPEAKER_GPIO=63
-    export MMC_GPIO=50
+    export MMC_GPIO_REDIR="$WYZEHACK_DIR/mmc_gpio_value.txt"
     ;;
 
 *)
@@ -382,7 +376,9 @@ mount_nfs() {
     done
 
     echo "WyzeHack: Notifying iCamera about SD card insertion event..."
-    echo "0" > $WYZEHACK_DIR/mmc_gpio_value.txt
+    if [ ! -z $MMC_GPIO_REDIR ]; then
+        echo "0" > $MMC_GPIO_REDIR
+    fi
     $WYZEHACK_DIR/bin/hackutils mmc_insert
 
     # Mark this directory for this camera
@@ -525,7 +521,9 @@ cmd_run() {
         # MMC detection hook init
         export PATH=$WYZEHACK_DIR/bin:$PATH
         export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
-        echo "1" > $WYZEHACK_DIR/mmc_gpio_value.txt
+        if [ ! -z $MMC_GPIO_REDIR ];then
+            echo "1" > $MMC_GPIO_REDIR
+        fi
         $WYZEHACK_DIR/bin/hackutils init
 
         export WYZEINIT_MD5=$(md5sum $WYZEINIT_SCRIPT| grep -oE "^[0-9a-f]*")

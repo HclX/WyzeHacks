@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.03:
+* Fixing broken SD card simuation on latest v3 firmware (4.36.0.252)
+
 ## 0.5.02:
 * Fixing an install issue with RTSP firmware.
 * Fixing an issue with NFS connectivity detection.
