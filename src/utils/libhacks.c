@@ -173,8 +173,6 @@ int open(char * file, int oflag) {
     if (g_hackdata->mmc_gpio_redir[0]) {
         for (int i = 0; i < ARRAY_SIZE(mmc_gpio_paths); i ++) {
             if (strcmp(file, mmc_gpio_paths[i]) == 0) {
-                printf("Redirecting access to %s to %s\n",
-                       file, g_hackdata->mmc_gpio_redir);
                 return s_pfn(g_hackdata->mmc_gpio_redir, oflag);
             }
         }
