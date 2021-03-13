@@ -10,6 +10,12 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.04:
+* Fixing hack not persisting through 4.X.6.241 update.
+* Getting rid of all the init file specific modifications.
+* Supporting the new logging method used in 4.X.6.241.
+* Stopping spamming log messages.
+
 ## 0.5.03:
 * Fixing broken SD card simuation on latest v3 firmware (4.36.0.252)
 

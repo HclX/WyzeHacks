@@ -118,6 +118,7 @@ wait_wlan() {
 
 hook_init() {
     if grep "wyze_hack.sh" /etc/init.d/rcS; then
+        echo "WyzeHack: hard modified, no need to hook ..."
         return 0
     fi
 
@@ -136,15 +137,18 @@ hook_init() {
     local SYSTEM_DIR=${1:-/system}
     if [ ! -L $SYSTEM_DIR/init/app_init.sh ];
     then
-        cp $SYSTEM_DIR/init/app_init.sh $WYZEINIT_SCRIPT
+        echo "WyzeHack: backing up app_init.sh ..."
+        cp $SYSTEM_DIR/init/app_init.sh $SYSTEM_DIR/init/app_init_orig.sh
     fi
 
     local APP_INIT=$(readlink $SYSTEM_DIR/init/app_init.sh)
     if [ "$APP_INIT" != "$WYZEHACK_BIN" ];
     then
+        echo "WyzeHack: setting up symlink ..."
         ln -s -f $WYZEHACK_BIN $SYSTEM_DIR/init/app_init.sh
     fi
 
+    ls -la $SYSTEM_DIR/init
     return 0
 }
 
@@ -402,7 +406,7 @@ check_nfs() {
         return 1
     fi
 
-    if ! timeout -t $NFS_TIMEOUT df /media/mmcblk0p1;
+    if ! timeout -t $NFS_TIMEOUT df /media/mmcblk0p1 > /dev/null 2>&1;
     then
         echo "WyzeHack: NFS no longer mounted as /media/mmcblk0p1"
         return 1
@@ -414,7 +418,7 @@ check_nfs() {
 sys_monitor() {
     while true; do
         local REBOOT_FLAG=0
-        if ! pgrep -f telnetd; then
+        if ! pgrep -f telnetd >/dev/null 2>&1; then
             echo "WyzeHack: Starting telnetd..."
             busybox telnetd
         fi
@@ -424,6 +428,11 @@ sys_monitor() {
         fi
 
         if [ "$SYNC_BOOT_LOG" = "1" ]; then
+            if pidof syslogd > /dev/null 2>&1 && \
+               ! pidof logread > /dev/null 2>&1 ; then
+                logread
+                logread -f &
+            fi
             log_sync
         fi
 
@@ -465,36 +474,48 @@ sys_monitor() {
     done
 
     echo "WyzeHack: Rebooting..."
-    killall sleep
+    killall sleep >/dev/null 2>&1
     sync
     sleep 10
     /sbin/reboot
 }
 
 cmd_reboot() {
+    set -x
     echo "WyzeHack: Camera is rebooting in 10 seconds ..."
-    if [ ! -f /system/.system ];
+    if [ ! -z $IN_UPDATE ];
     then
-        echo "WyzeHack: System partition not mounted, mounting..."
-        mount -t jffs2 /dev/mtdblock4 /system
+        echo "WyzeHack: In update, checking system partition ..."
+        cd /
+        umount -f /system || echo "WyzeHack: umount system failed ..."
+        mount -t jffs2 /dev/mtdblock4 /system || echo "WyzeHack: mount system failed ..."
     fi
 
-    hook_init
-    killall sleep
+    hook_init || echo "WyzeHack: hook_init failed ..."
 
+    killall sleep >/dev/null 2>&1
     sync
     sleep 10
     /sbin/reboot $@
 }
 
 cmd_run() {
-    # Run original script when no config file is found or in the middle of upgrade
+    # Run original script when no config file is found or unknown device model
     if [ ! -f "$WYZEHACK_CFG" ] || \
-       [ -f /system/.upgrade ] || \
-       [ -f /configs/.upgrade ] || \
        [ -z "$DEVICE_MODEL" ]; then
         $WYZEINIT_SCRIPT &
-        return 1
+        return 0
+    fi
+
+    # Run original script with reboot hook when device is in the middle of
+    # upgrade
+    if [ -f /system/.upgrade ] || \
+       [ -f /configs/.upgrade ]; then
+        export IN_UPDATE=1
+        export PATH=$WYZEHACK_DIR/bin:$PATH
+        export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
+        $WYZEINIT_SCRIPT &
+        return 0
     fi
 
     # Log syncing
@@ -524,20 +545,12 @@ cmd_run() {
         if [ ! -z $MMC_GPIO_REDIR ];then
             echo "1" > $MMC_GPIO_REDIR
         fi
+
+        # libsetunbuf.so is used as LD_PRELOAD for later v2 firmwares, so
+        # replace it with ours
+        ln -s $WYZEHACK_DIR/bin/libhacks.so $WYZEHACK_DIR/bin/libsetunbuf.so
         $WYZEHACK_DIR/bin/hackutils init
-
-        export WYZEINIT_MD5=$(md5sum $WYZEINIT_SCRIPT| grep -oE "^[0-9a-f]*")
-        echo "WyzeHack: app_init signature: $WYZEINIT_MD5"
-
-        local LOADER_SCRIPT="$WYZEHACK_DIR/init/$WYZEINIT_MD5/init.sh"
-        if [ ! -f "$LOADER_SCRIPT" ];
-        then
-            echo "WyzeHack: Unknown app_init.sh signature:$WYZEINIT_MD5"
-            LOADER_SCRIPT="$WYZEHACK_DIR/init/unknown/init.sh"
-        fi
-
-        # Load init script for the current firmware version
-        source $LOADER_SCRIPT
+        LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so $WYZEINIT_SCRIPT &
     fi
 
     # Wait until WIFI is connected
@@ -611,13 +624,16 @@ cmd_install() {
         cp -rL /etc $SD_DIR/debug
     fi
 
-    # Always try to enable telnetd
-    echo "WyzeHack: Enabling telnetd..."
-    busybox telnetd
+    if ! pgrep -f telnetd > /dev/null 2>&1; then
+        # Swapping shadow file so we can telnetd in without password. This
+        # is for debugging purpose.
+        set_passwd 'root::10933:0:99999:7:::'
 
-    # Swapping shadow file so we can telnetd in without password. This
-    # is for debugging purpose.
-    set_passwd 'root::10933:0:99999:7:::'
+        # Always try to enable telnetd
+        echo "WyzeHack: Enabling telnetd..."
+        busybox telnetd
+    fi
+
     if [ -z "$WYZEAPP_VER" ];
     then
         echo "WyzeHack: Wyze version not found!!!"
