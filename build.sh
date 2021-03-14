@@ -22,7 +22,6 @@ tar \
     ./main.sh \
     ./hack_ver.inc \
     ./bin \
-    ./init \
     >>.tmp/Upgrade/wyze_hack.sh
 
 chmod a+x .tmp/Upgrade/wyze_hack.sh
