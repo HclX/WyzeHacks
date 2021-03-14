@@ -166,7 +166,7 @@ With wyzehacks installed, you should have the telnet access available. You can
 log into the camera and perform the following steps (for v1, v2 and PAN):
 ```
   cp /system/init/app_init_orig.sh /system/init/app_init.sh 
-  rm /params/wyze_hacks.*
+  rm /params/wyze_hack.*
 ```
 Once you verified the above commands finished successfully you are no longer
 having any wyzehacks related stuff on the camera.
