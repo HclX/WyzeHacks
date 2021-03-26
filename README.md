@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.05:
+* Including v3 init into the default installation process.
+
 ## 0.5.04:
 * Fixing hack not persisting through 4.X.6.241 update.
 * Getting rid of all the init file specific modifications.

@@ -29,6 +29,7 @@ cp -r \
     ./wyze_hack/upgraderun.sh \
     ./wyze_hack/upgrade.sh \
     ./wyze_hack/install_snd \
+    ./wyze_hack/rootfs \
     .tmp/Upgrade/
 
 tar \

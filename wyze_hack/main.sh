@@ -116,6 +116,36 @@ wait_wlan() {
     done
 }
 
+init_rootfs() {
+    if grep "wyze_hack.sh" /etc/init.d/rcS; then
+        echo "WyzeHack: Device already initialized"
+        return 0
+    fi
+
+    if [ "$DEVICE_MODEL" != "V3" ]; then
+        echo "WyzeHack: No need to initialize root fs"
+        return 0
+    fi
+
+    ROOTFS_VER=$(grep -i AppVer /usr/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
+    ROOTFS_BIN=$1/$ROOTFS_VER.bin
+    if [ ! -f $ROOTFS_BIN ]; then
+        echo "WyzeHack: No root fs image found for version $ROOTFS_VER"
+        return 1
+    fi
+
+    # "hook_init" checks /etc/init.d/rcS to detect if rootfs is hard modified
+    # and it will skip the hook process if it is. However, since we bind mount
+    # /etc changes in this step will not show up in /etc/init.d/rcS. So to avoid
+    # that, we output some dummy lines to skip hook process.
+    echo "#wyze_hack.sh" >> /tmp/etc/init.d/rcS
+
+    sync
+    echo "WyzeHack: writing rootfs image $ROOTFS_BIN ..."
+    flashcp -v $ROOTFS_BIN /dev/mtd2
+    sync
+}
+
 hook_init() {
     if grep "wyze_hack.sh" /etc/init.d/rcS; then
         echo "WyzeHack: hard modified, no need to hook ..."
@@ -605,8 +635,7 @@ cmd_install() {
 
     if [ -d $SD_DIR ];
     then
-        exec >$SD_DIR/install.log
-        exec 2>&1
+        exec >$SD_DIR/install.log 2>&1
     fi
 
     echo "WyzeHack: Starting wyze hack installer..."
@@ -681,6 +710,12 @@ cmd_install() {
     # Copying wyze_hack scripts
     echo "WyzeHack: Copying wyze hack binary..."
     cp $THIS_BIN $WYZEHACK_BIN
+
+    if ! init_rootfs $THIS_DIR/rootfs; then
+        echo "WyzeHack: Init root fs failed, aborting..."
+        play_sound $THIS_DIR/install_snd/failed.wav 50
+        return 1
+    fi
 
     # Hook app_init.sh
     echo "WyzeHack: Hooking up boot script..."
