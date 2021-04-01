@@ -78,3 +78,15 @@ export NFS_ROOT='192.168.1.10:/volume1'
 #   openssl passwd -1 -salt <YOUR SALT> <YOUR PASSWORD>
 # Use the result to replace sample hash ($1$MYSALT$3Sy1OLRk4kTa7P6fvzwp71)
 # export PASSWD_SHADOW='root:$1$MYSALT$3Sy1OLRk4kTa7P6fvzwp71:10933:0:99999:7:::'
+
+# !!!ADVANCED USER!!!
+# If configured incorrectly you may brick your device!
+# WYZE_DEBUG=1
+
+# If WYZE_DEBUG, Uncomment this to enable automatically updating wlan.inc file based on file
+# < camera_folder > /wyzehacks/wlan.new.This will be checked every one minute.
+# export AUTO_WLAN_CONFIG = 1
+
+# If WYZE_DEBUG, Uncommect to specify a default WLAN AP to connect to
+# export WLAN_SSID = "WyzeHacks"
+# export WLAN_KEY = "ismart12"

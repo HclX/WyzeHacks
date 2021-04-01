@@ -5,6 +5,12 @@ export WYZEHACK_DIR=$(dirname $(readlink -f $0))
 export WYZEAPP_VER=$(grep -i AppVer /system/bin/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
 export WYZEHACK_CFG=/configs/wyze_hack.cfg
 export WYZEHACK_BIN=/configs/wyze_hack.sh
+export WYZECAM_DEBUG=/configs/.debug_flag
+export WYZEHACK_WLAN_CFG=/configs/wlan.cfg
+export WYZEHACK_WLAN_PID=$WYZEHACK_DIR/run/wlan.pid
+export WLAN_SSID = "WyzeHacks"
+export WLAN_SSID = "ismart12"
+
 
 if grep "wyze_hack.sh" /etc/init.d/rcS; then
     export WYZEINIT_SCRIPT=/system/init/app_init.sh
@@ -258,6 +264,31 @@ check_config() {
     return 1
 }
 
+check_wlan_config() {
+    if [ ! -f "/media/mmc/wyzehacks/wlan.new" ];then
+        echo "WyzeHack: New WLAN config file not found, skipping..."
+        return 0
+    fi
+    echo "WyzeHack: Found new WLAN config file, checking..."
+    sed 's/\r$//' /media/mmc/wyzehacks/wlan.new > /tmp/tmp_wlan
+    echo "WyzeHack: New WLAN config content:"
+    echo "WyzeHack: ====================="
+    cat /tmp/tmp_wlan
+    echo "WyzeHack: ====================="
+
+    echo "WyzeHack: Applying new WLAN config"
+    cp /tmp/tmp_wlan $WYZEHACK_WLAN_CFG
+    rm /media/mmc/wyzehacks/wlan.new
+
+    # Restart wpa_supplicant daemon
+    if [ -f $WYZECAM_DEBUG ]; then
+        kill -9 `cat $WYZEHACK_WLAN_PID`
+        sleep 5
+        /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
+    fi
+    return 0
+}
+
 check_update() {
     echo "WyzeHack: AUTO_UPDATE enabled, checking for update in $UPDATE_DIR..."
     local LATEST_UPDATE=$(ls -d $UPDATE_DIR/release_?_?_?? | sort -r | head -1)
@@ -275,7 +306,7 @@ check_update() {
 
     echo "WyzeHack: Installing update from $LATEST_UPDATE..."
     touch $UPDATE_FLAG
-    
+
     if ! $LATEST_UPDATE/telnet_install.sh; then
         echo "WyzeHack: Failed to install update..."
         return 0
@@ -446,6 +477,17 @@ sys_monitor() {
             let REBOOT_FLAG=$REBOOT_FLAG+$?
         fi
 
+        if [ "$AUTO_WLAN_CONFIG" = "1" ]; then
+            check_wlan_config
+            let REBOOT_FLAG=$REBOOT_FLAG+$?
+        fi
+
+        if [ "$WYZE_DEBUG" = "1" ]; then
+            echo '' > $WYZECAM_DEBUG
+        else
+            rm $WYZECAM_DEBUG
+        fi
+
         if [ ! -z "$REBOOT_AT" ]; then
             check_reboot
             let REBOOT_FLAG=$REBOOT_FLAG+$?
@@ -551,6 +593,28 @@ cmd_run() {
         ln -s $WYZEHACK_DIR/bin/libhacks.so $WYZEHACK_DIR/bin/libsetunbuf.so
         $WYZEHACK_DIR/bin/hackutils init
         LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so $WYZEINIT_SCRIPT &
+    fi
+
+    mkdir -p $WYZEHACK_DIR/run
+
+    # If WYZECAM_DEBUG, iCamera will not run and we will get softbrick.
+    # If debug mode
+    if [ -f $WYZECAM_DEBUG ]; then
+        # Create default WLAN config if missing.
+        if [ ! -f $WYZEHACK_WLAN_CFG ]; then
+          echo "ctrl_interface=/var/run/wpa_supplicant" > $WYZEHACK_WLAN_CFG
+          echo "update_config=1" >> $WYZEHACK_WLAN_CFG
+          echo "network={" >> $WYZEHACK_WLAN_CFG
+          echo "        ssid=\"${WLAN_SSID}\"" >> $WYZEHACK_WLAN_CFG
+          echo "        key_mgmt=WPA-PSK" >> $WYZEHACK_WLAN_CFG
+          echo "        pairwise=CCMP TKIP" >> $WYZEHACK_WLAN_CFG
+          echo "        group=CCMP TKIP WEP104 WEP40" >> $WYZEHACK_WLAN_CFG
+          echo "        psk=\"${WLAN_KEY}\"" >> $WYZEHACK_WLAN_CFG
+          echo "        scan_ssid=1" >> $WYZEHACK_WLAN_CFG
+          echo "}" >> $WYZEHACK_WLAN_CFG
+        fi
+        # Start wpa_supplicant daemon
+        /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
     fi
 
     # Wait until WIFI is connected
@@ -693,7 +757,7 @@ cmd_install() {
 
     play_sound $THIS_DIR/install_snd/finished.wav 50
 
-    rm $SD_DIR/version.ini.old > /dev/null 2>&1	
+    rm $SD_DIR/version.ini.old > /dev/null 2>&1
     mv $SD_DIR/version.ini $SD_DIR/version.ini.old > /dev/null 2>&1
     /sbin/reboot
 }
