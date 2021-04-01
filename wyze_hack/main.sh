@@ -8,6 +8,7 @@ export WYZEHACK_BIN=/configs/wyze_hack.sh
 export WYZECAM_DEBUG=/configs/.debug_flag
 export WYZEHACK_WLAN_CFG=/configs/wlan.cfg
 export WYZEHACK_WLAN_PID=$WYZEHACK_DIR/run/wlan.pid
+export WYZEHACK_DHCP_PID=$WYZEHACK_DIR/run/dhcp.pid
 export WLAN_SSID = "WyzeHacks"
 export WLAN_SSID = "ismart12"
 
@@ -285,7 +286,7 @@ check_wlan_config() {
         kill -9 `cat $WYZEHACK_WLAN_PID`
         sleep 5
         /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
-        udhcpc -i /dev/wlan0
+        #udhcpc -i /dev/wlan0
     fi
     return 0
 }
@@ -616,7 +617,7 @@ cmd_run() {
         fi
         # Start wpa_supplicant daemon
         /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
-        udhcpc -i /dev/wlan0
+        udhcpc -i wlan0 -p $WYZEHACK_DHCP_PID -b
     fi
 
     # Wait until WIFI is connected
