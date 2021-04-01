@@ -597,8 +597,6 @@ cmd_run() {
         LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so $WYZEINIT_SCRIPT &
     fi
 
-    mkdir -p $WYZEHACK_DIR/run
-
     # If WYZECAM_DEBUG, iCamera will not run and we will get softbrick.
     # If debug mode
     if [ -f $WYZECAM_DEBUG ]; then
@@ -616,6 +614,8 @@ cmd_run() {
           echo "}" >> $WYZEHACK_WLAN_CFG
         fi
         # Start wpa_supplicant daemon
+        sleep 5
+        mkdir -p $WYZEHACK_DIR/run
         /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID &
         udhcpc -i wlan0 -p $WYZEHACK_DHCP_PID -b &
     fi
