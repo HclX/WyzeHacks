@@ -9,9 +9,8 @@ export WYZECAM_DEBUG=/configs/.debug_flag
 export WYZEHACK_WLAN_CFG=/configs/wlan.cfg
 export WYZEHACK_WLAN_PID=$WYZEHACK_DIR/run/wlan.pid
 export WYZEHACK_DHCP_PID=$WYZEHACK_DIR/run/dhcp.pid
-export WLAN_SSID = "WyzeHacks"
-export WLAN_SSID = "ismart12"
-
+export WLAN_SSID="WyzeHacks"
+export WLAN_SSID="ismart12"
 
 if grep "wyze_hack.sh" /etc/init.d/rcS; then
     export WYZEINIT_SCRIPT=/system/init/app_init.sh
