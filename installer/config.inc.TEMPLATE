@@ -81,12 +81,12 @@ export NFS_ROOT='192.168.1.10:/volume1'
 
 # !!!ADVANCED USER!!!
 # If configured incorrectly you may brick your device!
-# WYZE_DEBUG=1
+# export WYZE_DEBUG=1
 
 # If WYZE_DEBUG, Uncomment this to enable automatically updating wlan.inc file based on file
 # < camera_folder > /wyzehacks/wlan.new.This will be checked every one minute.
-# export AUTO_WLAN_CONFIG = 1
+# export AUTO_WLAN_CONFIG=1
 
 # If WYZE_DEBUG, Uncommect to specify a default WLAN AP to connect to
-# export WLAN_SSID = "WyzeHacks"
-# export WLAN_KEY = "ismart12"
+# export WLAN_SSID="WyzeHacks"
+# export WLAN_KEY="ismart12"

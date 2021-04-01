@@ -93,6 +93,7 @@ if [ -z "$NFS_ROOT" ]; then
     export SYNC_BOOT_LOG=
     export AUTO_UPDATE=
     export AUTO_CONFIG=
+    export AUTO_WLAN_CONFIG=
 fi
 
 play_sound() {
@@ -615,8 +616,8 @@ cmd_run() {
           echo "}" >> $WYZEHACK_WLAN_CFG
         fi
         # Start wpa_supplicant daemon
-        /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
-        udhcpc -i wlan0 -p $WYZEHACK_DHCP_PID -b
+        /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID &
+        udhcpc -i wlan0 -p $WYZEHACK_DHCP_PID -b &
     fi
 
     # Wait until WIFI is connected
