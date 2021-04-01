@@ -285,6 +285,7 @@ check_wlan_config() {
         kill -9 `cat $WYZEHACK_WLAN_PID`
         sleep 5
         /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
+        udhcpc -i /dev/wlan0
     fi
     return 0
 }
@@ -615,6 +616,7 @@ cmd_run() {
         fi
         # Start wpa_supplicant daemon
         /bin/wpa_supplicant -D nl80211 -i wlan0 -c $WYZEHACK_WLAN_CFG -B -P $WYZEHACK_WLAN_PID
+        udhcpc -i /dev/wlan0
     fi
 
     # Wait until WIFI is connected
