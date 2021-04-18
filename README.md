@@ -199,6 +199,20 @@ You will need to perform a SD card recovery with the following steps:
   The LED status light on the device will change from Solid Red to Flashing Red.
   The device is now ready to be setup again
 
+## Default telnet credentials
+#### V1/V2
+  user: root  
+  pass: ismart12
+  
+#### Pan
+the default password is currently not known
+so you will have to set your password shadow to allow you login. Check the
+`PASSWD_SHADOW` section in `config.inc.TEMPLATE` on how to do that.
+
+#### V3
+  user: root  
+  pass: XXXXX  
+
 ## How do I uninstall the hack?
 To uninstall the hack, I recommend you go through the SD card recovery method 
 in #1 and then perform a factory reset.
