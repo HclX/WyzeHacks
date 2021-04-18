@@ -85,15 +85,22 @@ export NFS_ROOT='192.168.1.10:/volume1'
 # export CUSTOM_SCRIPT='/mnt/WyzeCams/scripts/myscript.sh'
 
 # Default telnet Credentials
-# V1/V2/Pan
-# User:
-# Pass:
+# V1/V2
+# User:root  
+# Pass:ismart12  
+
+# Pan
+# the default password is currently not known
+# so you will have to set your password shadow to allow you login. Check the
+# `PASSWD_SHADOW` section in `config.inc.TEMPLATE` on how to do that.
 
 # V3
-# User:
+# User:root
 # Pass
 
+
 # !!!ADVANCED USER!!!
+# Change Default root password  
 # This changes the default root password to whatever you specified. To
 # generate your own password hash, use the following command from a
 # linux environment:
