@@ -2,33 +2,41 @@
 # Make your own copy of this file and put it under the root of SD card
 # with name "config.inc" when installing the hack.
 
+# NFS Root Directory
 # You need to modify NFS_ROOT to point to your NFS share. The recordings
 # will be stored under $NFS_ROOT/WyzeCams/<MAC_ADDR_OF_YOUR_CAMERA>.
 export NFS_ROOT='192.168.1.10:/volume1'
 
+# NFS Mount Options
 # Some NFS configurations may need special mount options. You can specify
 # them here. The default value is verified on my camera with a NFS v3 share
 # on my home server.
 # export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
 
+# NFS Timeout threshold
 # Timeout threshold for NFS connectivity check. If the NFS share is not
 # available for more than '$NFS_TIMEOUT' seconds, a reboot will be initiated
 # trying to resolve the network connectivity. The default value is 15 seconds.
 # export NFS_TIMEOUT=15
 
+# Timed Auto Reboot
 # Uncomment and modify the AUTO_REBOOT variable to automatically reboot
 # the camera at a specific minute. Time is specified in "HH:MM" format
 # in local time.
 # export REBOOT_AT='13:16'
 
+# Auto Archive
 # Uncomment and modify the ARCHIVE_OLDER_THAN variable to automatically
 # archive recording clips and alarm images if it's a certain days older.
 # export ARCHIVE_OLDER_THAN=5
 
+# Log on NFS Share
 # Uncomment the following variable to sync the console log to the camera
 # folder in NFS share. Use with caution as the log contains sensitive
 # information and will cause your account compromise if leaked.
 # export SYNC_BOOT_LOG=1
+
+# Ping KeepAlive
 
 # In my setup I noticed at some occasions the camera starts rebooting frequently
 # which seems to be a result of dropping wifi connections. Running a "ping"
@@ -70,6 +78,15 @@ export NFS_ROOT='192.168.1.10:/volume1'
 # command line arguments. The script will be executed in background.
 # export CUSTOM_SCRIPT='/media/mmc/scripts/myscript.sh'
 # export CUSTOM_SCRIPT='/mnt/WyzeCams/scripts/myscript.sh'
+
+# Default telnet Credentials
+# V1/V2/Pan
+# User:
+# Pass:
+
+# V3
+# User:
+# Pass
 
 # !!!ADVANCED USER!!!
 # This changes the default root password to whatever you specified. To
