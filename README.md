@@ -9,83 +9,8 @@ functions:
 5. Automatically reboot the camera at certain time.
 6. Automatically archive the recordings.
 
-# Release notes
-## 0.5.05:
-* Including v3 init into the default installation process.
 
-## 0.5.04:
-* Fixing hack not persisting through 4.X.6.241 update.
-* Getting rid of all the init file specific modifications.
-* Supporting the new logging method used in 4.X.6.241.
-* Stopping spamming log messages.
-
-## 0.5.03:
-* Fixing broken SD card simuation on latest v3 firmware (4.36.0.252)
-
-## 0.5.02:
-* Fixing an install issue with RTSP firmware.
-* Fixing an issue with NFS connectivity detection.
-* Adding a customizable threshold for NFS connectivity detection.
-* Making sure telnetd is enabled before NFS mount.
-
-## 0.5.01:
-* Auto update and auto config are now checked every minute.
-* Fixing config update mechanism.
-* Changing auto reboot to use local time.
-* Moving logs to a different directory.
-* Support telnetd and physical SD card when NFS_ROOT is not specified.
-* Refreshing ifconfig.txt every minute.
-* Better method for SD card insertion simulation.
-* Removing dummymmc kernel module and uevent_recv/uevent_send binaries.
-* Adding uninstallation method.
-* Moving v2 installation location from /params to /configs.
-* WIP v3 camera support (require special steps, see tools/v3/README.md).
-* Tested on firmware 4.9.6.224 (V2), 4.6.10.224 (PAN) and 4.36.0.228 (V3).
-* Reducing wyzehack binary size by excluding some sound files.
-
-## 0.4.04:
-* Adding support for latest firmware (4.9.6.218, 4.10.6.218).
-* Adding support of custom script.
-* Adding support for automatic config and wyzehack update.
-* Adding support of customized hostname.
-
-Note: Wyze made some changes in version 4.x.6.218 cuasing it really hard to
-install wyze hacks non-intrusively. So I have to make some version specific
-changes, and there may be more version specific changes coming later if they
-changed it again. This means we may need more frequently releases than before
-(worst case for every stable firmware). This is why I added auto-update
-mechanism in this release to make my (and others) lives easier in future.
-
-## 0.4.03:
-* Adding notification volume control.
-* Reducing the emulated SD card to 128GB to avoid issues.
-
-## 0.4.02:
-* Adding an option to prevent wifi disconnecting.
-* Integrating TOTP based 2FA.
-* Supporting camera directory name containing space characters
-* Detecting stale NFS connection.
-
-## 0.4.01:
-* Detecting NFS unmount and automatically reboot the camera.
-* Fixing SD card size to properly support large NFS shares.
-* Fixing config.inc.TEMPLATE comments
-
-## 0.4.00:
-* Support firmware version 4.9.6.156 (WyzeCamV2) and 4.10.6.156 (WyzeCam Pan).
-* Due to new firmware blocking SD card installation, a new remote installation
-method has to be used.
-* SD card size emulation to make sure the hack works with large NFS shares.
-* Support NFS mount command line options in config file.
-
-# Download and installation
-The latest release archive can be found in the [release folder]
-(https://github.com/HclX/WyzeHacks/tree/master/release). You will need to unzip
-the release archive before proceed. Depending on the firmware version your
-camera is running, you may have two or three different approaches to install the
-hack.
-
-## Remote install using remote_install.sh
+## Remote install using remote_install.sh [Recommended]
 This installation method emulates the Wyze App protocol to push the update to a
 running camera. You will need the following for installation:
 * A Linux-like environment with Python3.7 installed. If you are using linux, it
@@ -184,7 +109,6 @@ This removes the wyzehacks boot straping code from the camera so that it will
 not be loaded by the camera firmware. However, your configuration file remains
 on the camera. Luckily there is not much sensentive information in that file.
 
-
 # Features:
 ## NFS share naming:
   The per camera NFS share was named by the camera's MAC address, but it's very
@@ -261,7 +185,33 @@ You will need to perform a SD card recovery with the following steps:
   5. Wait for a couple seconds, release the reset button
   6. After some time, your camera should have the factory firmware installed.
   7. Please note this doesn't erase your configurations, which needs to be done 
-  through a factory reset method.
+  through a factory reset method below .
+### Cam V1/V2 or Pan
+  To factory reset the v1/v2 or Pan:
+  remove microSD Card
+  With the Wyze Cam plugged into power, press and hold the setup button on the bottom of the camera for 10 seconds. This will reset the camera.
+  For Wyze Cam v1, press and hold it for 20 seconds
+### Cam v3
+  If you have a microSD card inserted, remove it.
+  With the Wyze Cam plugged into power, press and hold the setup button on the bottom of the camera for 10 seconds. This will reset the camera.
+  Wait at least 30 seconds for the unit to initiate.
+  This process can take up to 5 minutes. It's rare, but it's possible.
+  The LED status light on the device will change from Solid Red to Flashing Red.
+  The device is now ready to be setup again
+
+## Default telnet credentials
+#### V1/V2
+  user: root  
+  pass: ismart12
+  
+#### Pan
+the default password is currently not known
+so you will have to set your password shadow to allow you login. Check the
+`PASSWD_SHADOW` section in `config.inc.TEMPLATE` on how to do that.
+
+#### V3
+  user: root  
+  pass: XXXXX  
 
 ## How do I uninstall the hack?
 To uninstall the hack, I recommend you go through the SD card recovery method 
