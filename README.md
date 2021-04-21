@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.06
+* Support v3 cameras with root fs version 4.36.0.112 and 4.36.0.56.
+
 ## 0.5.05:
 * Including v3 init into the default installation process.
 

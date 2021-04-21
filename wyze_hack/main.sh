@@ -128,9 +128,20 @@ init_rootfs() {
     fi
 
     ROOTFS_VER=$(grep -i AppVer /usr/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
-    ROOTFS_BIN=$1/$ROOTFS_VER.bin
-    if [ ! -f $ROOTFS_BIN ]; then
+    for x in $1/*
+    do
+        if grep -F "[$ROOTFS_VER]" $x/versions.txt; then
+            ROOTFS_BIN=$x/rootfs.bin
+            break
+        fi
+    done
+
+    if [ -z $ROOTFS_BIN ]; then
         echo "WyzeHack: No root fs image found for version $ROOTFS_VER"
+        return 1
+    fi
+    if [ ! -f $ROOTFS_BIN ]; then
+        echo "WyzeHack: Root fs image $ROOTFS_BIN does not exist"
         return 1
     fi
 
