@@ -447,7 +447,15 @@ check_nfs() {
         return 1
     fi
 
-    if ! timeout -t $NFS_TIMEOUT df /media/mmcblk0p1 > /dev/null 2>&1;
+    # A new version BusyBox changed the command line format of timeout, causing
+    # lots of false alarms.
+    if timeout --help 2>&1| grep -F '[-t SECS]' > /dev/null; then
+        TIMEOUT_ARGS="-t $NFS_TIMEOUT"
+    else
+        TIMEOUT_ARGS="$NFS_TIMEOUT"
+    fi
+
+    if ! timeout $TIMEOUT_ARGS df /media/mmcblk0p1 > /dev/null 2>&1;
     then
         echo "WyzeHack: NFS no longer mounted as /media/mmcblk0p1"
         return 1

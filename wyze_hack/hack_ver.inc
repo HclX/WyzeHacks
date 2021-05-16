@@ -1,1 +1,1 @@
-export WYZEHACK_VER=0.5.06
+export WYZEHACK_VER=0.5.07
