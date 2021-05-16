@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.07
+* Fixing the "network disconnected" issue on latest v2/pan beta firmware.
+
 ## 0.5.06
 * Support v3 cameras with root fs version 4.36.0.112 and 4.36.0.56.
 
