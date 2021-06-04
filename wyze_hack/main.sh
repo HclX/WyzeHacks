@@ -581,7 +581,10 @@ cmd_run() {
     echo "WyzeHack: WyzeHack version: $WYZEHACK_VER"
 
     # Set hostname
-    hostname ${HOSTNAME:-"WyzeCam-$(echo -n $DEVICE_ID | tail -c 4)"}
+    if [ -z "${CUSTOM_HOSTNAME}" ]; then
+        CUSTOM_HOSTNAME="WyzeCam${DEVICE_MODEL}-$(echo -n $DEVICE_ID | tail -c 4)"
+    fi
+    hostname ${CUSTOM_HOSTNAME}
 
     if [ -z "$NFS_ROOT" ]; then
         # No NFS_ROOT specified, skipping all the MMC spoofing thing and run
