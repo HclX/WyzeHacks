@@ -211,7 +211,7 @@ so you will have to set your password shadow to allow you login. Check the
 
 #### V3
   user: root  
-  pass: XXXXX  
+  pass: WYom2020
 
 ## How do I uninstall the hack?
 To uninstall the hack, I recommend you go through the SD card recovery method 
