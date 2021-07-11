@@ -41,8 +41,8 @@ export NFS_ROOT='192.168.1.10:/volume1'
 # export NOTIFICATION_VOLUME=80
 
 # Uncomment and update this value to customize the hostname of the camera. By
-# default it will be set to <WyzeCam>-<last 4 hex digits of the mac>.
-# export HOSTNAME='<hostname>'
+# default it will be set to <WyzeCam><Model>-<last 4 hex digits of the mac>.
+# export CUSTOM_HOSTNAME='<hostname>'
 
 # Uncomment this to enable automatically updating config.inc file based on file
 # <camera_folder>/wyzehacks/config.new. This will be checked every one minute.

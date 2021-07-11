@@ -10,8 +10,14 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
-## 0.5.08
+## 0.5.09
 * Adding support to latest rootfs from v3 beta firmware 4.36.3.19
+
+## 0.5.08
+* Fixing device hostname
+* Including device model in hostname
+* BREAKING CHANGE: The custom hostname config variable is renamed to `CUSTOM_HOSTNAME` due to naming conflict with some device models
+* Merged PR130 for large NFS partition support
 
 ## 0.5.07
 * Fixing the "network disconnected" issue on latest v2/pan beta firmware.
