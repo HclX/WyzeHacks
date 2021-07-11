@@ -455,7 +455,7 @@ check_nfs() {
         TIMEOUT_ARGS="$NFS_TIMEOUT"
     fi
 
-    if ! timeout $TIMEOUT_ARGS df /media/mmcblk0p1 > /dev/null 2>&1;
+    if ! timeout $TIMEOUT_ARGS ls /media/mmcblk0p1 > /dev/null 2>&1;
     then
         echo "WyzeHack: NFS no longer mounted as /media/mmcblk0p1"
         return 1
