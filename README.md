@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.08
+* Adding support to latest rootfs from v3 beta firmware 4.36.3.19
+
 ## 0.5.07
 * Fixing the "network disconnected" issue on latest v2/pan beta firmware.
 
