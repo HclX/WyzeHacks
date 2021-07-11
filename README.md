@@ -14,6 +14,7 @@ functions:
 * Fixing device hostname
 * Including device model in hostname
 * BREAKING CHANGE: The custom hostname config variable is renamed to `CUSTOM_HOSTNAME` due to naming conflict with some device models
+* Merged PR130 for large NFS partition support
 
 ## 0.5.07
 * Fixing the "network disconnected" issue on latest v2/pan beta firmware.
