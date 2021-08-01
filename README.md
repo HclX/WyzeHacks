@@ -10,6 +10,9 @@ functions:
 6. Automatically archive the recordings.
 
 # Release notes
+## 0.5.09
+* WIP: Adding option to bypass Wyze's server side checks (requires DNS spoofing setup)
+
 ## 0.5.08
 * Fixing device hostname
 * Including device model in hostname
