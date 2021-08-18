@@ -1,16 +1,10 @@
 #!/bin/sh
 [ -z $WYZEHACK_DBG ] || set -x
 
-export WYZEHACK_DIR=$(dirname $(readlink -f $0))
+export THIS_DIR=$(dirname $(readlink -f $0))
 export WYZEAPP_VER=$(grep -i AppVer /system/bin/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
-export WYZEHACK_CFG=/configs/wyze_hack.cfg
-export WYZEHACK_BIN=/configs/wyze_hack.sh
-
-if grep "wyze_hack.sh" /etc/init.d/rcS; then
-    export WYZEINIT_SCRIPT=/system/init/app_init.sh
-else
-    export WYZEINIT_SCRIPT=/system/init/app_init_orig.sh
-fi
+export WYZEHACK_CFG=$WYZEHACK_DIR/wyze_hack.cfg
+export WYZEINIT_SCRIPT=/system/init/app_init.sh
 
 case $WYZEAPP_VER in
 3.9.*)
@@ -60,20 +54,23 @@ case $WYZEAPP_VER in
     export DEVICE_ID=$(grep -E -o CONFIG_INFO=[0-9A-F]+ /configs/.product_config | cut -c 13-24)
     export DEVICE_MODEL="V3"
     export SPEAKER_GPIO=63
-    export MMC_GPIO_REDIR="$WYZEHACK_DIR/mmc_gpio_value.txt"
+    export MMC_GPIO_REDIR="$THIS_DIR/mmc_gpio_value.txt"
     ;;
 
 *)
     # Unknown
-    export WYZEINIT_SCRIPT=/system/init/app_init.sh
     ;;
 esac
 
 # Hack vesion
-source $WYZEHACK_DIR/hack_ver.inc
+. $THIS_DIR/hack_ver.inc
 
 # User configuration
-[ -f $WYZEHACK_CFG ] && source $WYZEHACK_CFG
+if [ -f $WYZEHACK_CFG ]; then
+    sed 's/\r$//' $WYZEHACK_CFG > $THIS_DIR/wyze_hack.cfg
+    . $THIS_DIR/wyze_hack.cfg
+fi
+
 [ -z $WYZEHACK_DBG ] || set -x
 
 # Default values
@@ -91,16 +88,14 @@ fi
 
 play_sound() {
     echo "1">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
-    $WYZEHACK_DIR/bin/audioplay $@ 1>/dev/null 2>&1
+    $THIS_DIR/bin/audioplay $@ 1>/dev/null 2>&1
     echo "0">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
 }
 
 set_passwd() {
-    /bin/umount /etc
-    rm -rf /tmp/etc
-    cp -r /etc /tmp/
-    echo $1 >/tmp/etc/shadow
-    /bin/mount -o bind /tmp/etc /etc
+    /bin/umount /etc/shadow
+    echo $1 >/tmp/shadow
+    /bin/mount -o bind /tmp/shadow /etc/shadow
 }
 
 wait_wlan() {
@@ -114,83 +109,6 @@ wait_wlan() {
         echo "WyzeHack: wlan0 not ready yet..."
         sleep 10
     done
-}
-
-init_rootfs() {
-    if grep "wyze_hack.sh" /etc/init.d/rcS; then
-        echo "WyzeHack: Device already initialized"
-        return 0
-    fi
-
-    if [ "$DEVICE_MODEL" != "V3" ]; then
-        echo "WyzeHack: No need to initialize root fs"
-        return 0
-    fi
-
-    ROOTFS_VER=$(grep -i AppVer /usr/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
-    for x in $1/*
-    do
-        if grep -F "[$ROOTFS_VER]" $x/versions.txt; then
-            ROOTFS_BIN=$x/rootfs.bin
-            break
-        fi
-    done
-
-    if [ -z $ROOTFS_BIN ]; then
-        echo "WyzeHack: No root fs image found for version $ROOTFS_VER"
-        return 1
-    fi
-    if [ ! -f $ROOTFS_BIN ]; then
-        echo "WyzeHack: Root fs image $ROOTFS_BIN does not exist"
-        return 1
-    fi
-
-    # "hook_init" checks /etc/init.d/rcS to detect if rootfs is hard modified
-    # and it will skip the hook process if it is. However, since we bind mount
-    # /etc changes in this step will not show up in /etc/init.d/rcS. So to avoid
-    # that, we output some dummy lines to skip hook process.
-    echo "#wyze_hack.sh" >> /tmp/etc/init.d/rcS
-
-    sync
-    echo "WyzeHack: writing rootfs image $ROOTFS_BIN ..."
-    flashcp -v $ROOTFS_BIN /dev/mtd2
-    sync
-}
-
-hook_init() {
-    if grep "wyze_hack.sh" /etc/init.d/rcS; then
-        echo "WyzeHack: hard modified, no need to hook ..."
-        return 0
-    fi
-
-    if [ ! -f $WYZEHACK_BIN ];
-    then
-        echo "WyzeHack: wyze hack main binary not found: $WYZEHACK_BIN"
-        return 1
-    fi
-
-    if [ ! -f $WYZEHACK_CFG ];
-    then
-        echo "WyzeHack: wyze hack config file not found: $WYZEHACK_CFG"
-        return 1
-    fi
-
-    local SYSTEM_DIR=${1:-/system}
-    if [ ! -L $SYSTEM_DIR/init/app_init.sh ];
-    then
-        echo "WyzeHack: backing up app_init.sh ..."
-        cp $SYSTEM_DIR/init/app_init.sh $SYSTEM_DIR/init/app_init_orig.sh
-    fi
-
-    local APP_INIT=$(readlink $SYSTEM_DIR/init/app_init.sh)
-    if [ "$APP_INIT" != "$WYZEHACK_BIN" ];
-    then
-        echo "WyzeHack: setting up symlink ..."
-        ln -s -f $WYZEHACK_BIN $SYSTEM_DIR/init/app_init.sh
-    fi
-
-    ls -la $SYSTEM_DIR/init
-    return 0
 }
 
 log_init() {
@@ -424,7 +342,7 @@ mount_nfs() {
     if [ ! -z $MMC_GPIO_REDIR ]; then
         echo "0" > $MMC_GPIO_REDIR
     fi
-    $WYZEHACK_DIR/bin/hackutils mmc_insert
+    $THIS_DIR/bin/hackutils mmc_insert
 
     # Mark this directory for this camera
     touch /media/mmcblk0p1/.mac_$DEVICE_ID
@@ -464,13 +382,28 @@ check_nfs() {
     return 0
 }
 
+# Starting sshd
+check_sshd() {
+    if pgrep -f dropbear >/dev/null 2>&1; then
+        return 0
+    fi
+
+    echo "WyzeHack: Starting ssh daemon..."
+    DROPBEAR_BIN=$THIS_DIR/bin/dropbear
+    HOST_KEY_FILE=$WYZEHACK_CFG/config/dropbear_ecdsa_host_key
+    if [ ! -f $HOST_KEY_FILE ]; then
+        echo "WyzeHack: Generating SSH host key file $HOST_KEY_FILE"
+        mkdir -p $WYZEHACK_CFG/config
+        $THIS_DIR/bin/dropbearkey -t ecdsa -f $HOST_KEY_FILE
+    fi
+    $DROPBEAR_BIN -B -r $HOST_KEY_FILE
+}
+
 sys_monitor() {
     while true; do
         local REBOOT_FLAG=0
-        if ! pgrep -f telnetd >/dev/null 2>&1; then
-            echo "WyzeHack: Starting telnetd..."
-            busybox telnetd
-        fi
+
+        check_sshd
 
         if [ ! -z "$ARCHIVE_OLDER_THAN" ]; then
             do_archive
@@ -529,40 +462,12 @@ sys_monitor() {
     /sbin/reboot
 }
 
-cmd_reboot() {
-    set -x
-    echo "WyzeHack: Camera is rebooting in 10 seconds ..."
-    if [ ! -z $IN_UPDATE ];
-    then
-        echo "WyzeHack: In update, checking system partition ..."
-        cd /
-        umount -f /system || echo "WyzeHack: umount system failed ..."
-        mount -t jffs2 /dev/mtdblock4 /system || echo "WyzeHack: mount system failed ..."
-    fi
-
-    hook_init || echo "WyzeHack: hook_init failed ..."
-
-    killall sleep >/dev/null 2>&1
-    sync
-    sleep 10
-    /sbin/reboot $@
-}
-
 cmd_run() {
     # Run original script when no config file is found or unknown device model
     if [ ! -f "$WYZEHACK_CFG" ] || \
-       [ -z "$DEVICE_MODEL" ]; then
-        $WYZEINIT_SCRIPT &
-        return 0
-    fi
-
-    # Run original script with reboot hook when device is in the middle of
-    # upgrade
-    if [ -f /system/.upgrade ] || \
-       [ -f /configs/.upgrade ]; then
-        export IN_UPDATE=1
-        export PATH=$WYZEHACK_DIR/bin:$PATH
-        export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
+       [ -z "$DEVICE_MODEL" ] || \
+       [ -f /system/.upgrade ] || \
+       [ -f /configs/.upgrade ] ; then
         $WYZEINIT_SCRIPT &
         return 0
     fi
@@ -592,17 +497,17 @@ cmd_run() {
         $WYZEINIT_SCRIPT&
     else
         # MMC detection hook init
-        export PATH=$WYZEHACK_DIR/bin:$PATH
-        export LD_LIBRARY_PATH=$WYZEHACK_DIR/bin:$LD_LIBRARY_PATH
+        export PATH=$THIS_DIR/bin:$PATH
+        export LD_LIBRARY_PATH=$THIS_DIR/bin:$LD_LIBRARY_PATH
         if [ ! -z $MMC_GPIO_REDIR ];then
             echo "1" > $MMC_GPIO_REDIR
         fi
 
         # libsetunbuf.so is used as LD_PRELOAD for later v2 firmwares, so
         # replace it with ours
-        ln -s $WYZEHACK_DIR/bin/libhacks.so $WYZEHACK_DIR/bin/libsetunbuf.so
-        $WYZEHACK_DIR/bin/hackutils init
-        LD_PRELOAD=$WYZEHACK_DIR/bin/libhacks.so $WYZEINIT_SCRIPT &
+        mount -o bind $THIS_DIR/bin/libhacks.so /system/lib/libsetunbuf.so
+        $THIS_DIR/bin/hackutils init
+        LD_PRELOAD=$THIS_DIR/bin/libhacks.so $WYZEINIT_SCRIPT &
     fi
 
     # Wait until WIFI is connected
@@ -615,8 +520,8 @@ cmd_run() {
         ping $GATEWAY_IP 2>&1 >/dev/null &
     fi
 
-    # Starting telnetd first
-    busybox telnetd
+    # Starting sshd first
+    check_sshd
 
     if [ -z "$NFS_ROOT" ]; then
         echo "WyzeHack: NFS_ROOT not defined, skipping NFS mount..."
@@ -626,7 +531,7 @@ cmd_run() {
 
             # Copy some information to the NFS share
             mkdir -p /media/mmcblk0p1/wyzehacks
-            cp $WYZEHACK_CFG /media/mmcblk0p1/wyzehacks/config.inc
+            cp $WYZEHACK_CFG /media/mmcblk0p1/wyzehacks/wyze_hack.cfg
 
             # Initializing logging
             log_init
@@ -645,114 +550,6 @@ cmd_run() {
     fi
 
     sys_monitor
-}
-
-cmd_install() {
-    set -x
-    local SD_DIR=/media/mmcblk0p1
-    if [ ! -d $SD_DIR ];
-    then
-        SD_DIR=/media/mmc
-    fi
-
-    if [ -d $SD_DIR ];
-    then
-        exec >$SD_DIR/install.log 2>&1
-    fi
-
-    echo "WyzeHack: Starting wyze hack installer..."
-
-    play_sound $THIS_DIR/install_snd/begin.wav 50
-
-    if [ -f $SD_DIR/debug/.copyfiles ];
-    then
-        echo "WyzeHack: Copying files for debugging purpose..."
-        rm -rf $SD_DIR/debug/system
-        rm -rf $SD_DIR/debug/etc
-
-        # Copying system and etc back to SD card for analysis
-        cp -rL /system $SD_DIR/debug
-        cp -rL /etc $SD_DIR/debug
-    fi
-
-    if ! pgrep -f telnetd > /dev/null 2>&1; then
-        # Swapping shadow file so we can telnetd in without password. This
-        # is for debugging purpose.
-        set_passwd 'root::10933:0:99999:7:::'
-
-        # Always try to enable telnetd
-        echo "WyzeHack: Enabling telnetd..."
-        busybox telnetd
-    fi
-
-    if [ -z "$WYZEAPP_VER" ];
-    then
-        echo "WyzeHack: Wyze version not found!!!"
-        play_sound $THIS_DIR/install_snd/failed.wav 50
-        return 1
-    fi
-
-    echo "WyzeHack: Current Wyze software version is $WYZEAPP_VER"
-    echo "WyzeHack: Installing WyzeHacks version $THIS_VER"
-
-    # Updating user config if exists
-    if [ -f "/params/wyze_hack.cfg" ];
-    then
-        echo "WyzeHack: Migrating from /params to /configs"
-        cp /params/wyze_hack.cfg $WYZEHACK_CFG
-        rm /params/wyze_hack.*
-    fi
-
-    if [ -f $THIS_DIR/config.inc ];
-    then
-        echo "WyzeHack: Use config file $THIS_DIR/config.inc"
-        sed 's/\r$//' $THIS_DIR/config.inc > $WYZEHACK_CFG
-    fi
-
-    if [ -f "$SD_DIR/config.inc" ];
-    then
-        echo "WyzeHack: Use config file $SD_DIR/config.inc"
-        sed 's/\r$//' $SD_DIR/config.inc > $WYZEHACK_CFG
-    fi
-
-    if [ ! -f "$WYZEHACK_CFG" ];
-    then
-        echo "WyzeHack: Configuration file not found, aborting..."
-        play_sound $THIS_DIR/install_snd/failed.wav 50
-        return 1
-    fi
-
-    if [ -z "$DEVICE_MODEL" ];
-    then
-        echo "WyzeHack: Unknown device model, aborting..."
-        play_sound $THIS_DIR/install_snd/failed.wav 50
-        return 1
-    fi
-
-    # Copying wyze_hack scripts
-    echo "WyzeHack: Copying wyze hack binary..."
-    cp $THIS_BIN $WYZEHACK_BIN
-
-    if ! init_rootfs $THIS_DIR/rootfs; then
-        echo "WyzeHack: Init root fs failed, aborting..."
-        play_sound $THIS_DIR/install_snd/failed.wav 50
-        return 1
-    fi
-
-    # Hook app_init.sh
-    echo "WyzeHack: Hooking up boot script..."
-    if ! hook_init;
-    then
-        echo "WyzeHack: Hooking up boot script failed"
-        play_sound $THIS_DIR/install_snd/failed.wav 50
-        return 1
-    fi
-
-    play_sound $THIS_DIR/install_snd/finished.wav 50
-
-    rm $SD_DIR/version.ini.old > /dev/null 2>&1	
-    mv $SD_DIR/version.ini $SD_DIR/version.ini.old > /dev/null 2>&1
-    /sbin/reboot
 }
 
 cmd_test() {
