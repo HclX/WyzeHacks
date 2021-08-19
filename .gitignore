@@ -2,9 +2,5 @@
 .vscode
 release/*
 !release/*.zip
-installer/config.inc
-installer/version.ini
-installer/FIRMWARE_660R.bin
-installer/firmware.bin
-installer/Upgrade
-installer/.tokens
+installer/wyze_hack/wyze_hack.cfg
+installer/wyze_hack/wyze_hack.bin

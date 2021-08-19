@@ -1,0 +1,80 @@
+# USER CONFIGURATIONS -- TO BE MODIFIED BY USER
+# Make your own copy of this file and put it under the root of SD card
+# with name "config.inc" when installing the hack.
+
+# You need to modify NFS_ROOT to point to your NFS share. The recordings
+# will be stored under $NFS_ROOT/WyzeCams/<MAC_ADDR_OF_YOUR_CAMERA>.
+export NFS_ROOT='192.168.1.10:/volume1'
+
+# Some NFS configurations may need special mount options. You can specify
+# them here. The default value is verified on my camera with a NFS v3 share
+# on my home server.
+# export NFS_OPTIONS='-o nolock,rw,noatime,nodiratime'
+
+# Timeout threshold for NFS connectivity check. If the NFS share is not
+# available for more than '$NFS_TIMEOUT' seconds, a reboot will be initiated
+# trying to resolve the network connectivity. The default value is 15 seconds.
+# export NFS_TIMEOUT=15
+
+# Uncomment and modify the AUTO_REBOOT variable to automatically reboot
+# the camera at a specific minute. Time is specified in "HH:MM" format
+# in local time.
+# export REBOOT_AT='13:16'
+
+# Uncomment and modify the ARCHIVE_OLDER_THAN variable to automatically
+# archive recording clips and alarm images if it's a certain days older.
+# export ARCHIVE_OLDER_THAN=5
+
+# Uncomment the following variable to sync the console log to the camera
+# folder in NFS share. Use with caution as the log contains sensitive
+# information and will cause your account compromise if leaked.
+# export SYNC_BOOT_LOG=1
+
+# In my setup I noticed at some occasions the camera starts rebooting frequently
+# which seems to be a result of dropping wifi connections. Running a "ping"
+# command in background seems to be solving this issue. Uncomment this variable
+# to enable this fix.
+# export PING_KEEPALIVE=1
+
+# Uncomment to enable voice notification when NFS network connection lost. The
+# value should be in range of 0 and 100
+# export NOTIFICATION_VOLUME=80
+
+# Uncomment and update this value to customize the hostname of the camera. By
+# default it will be set to <WyzeCam><Model>-<last 4 hex digits of the mac>.
+# export CUSTOM_HOSTNAME='<hostname>'
+
+# Uncomment this to enable automatically updating config.inc file based on file
+# <camera_folder>/wyzehacks/config.new. This will be checked every one minute.
+# export AUTO_CONFIG=1
+
+# Uncomment this to enable automatically updating wyzehacks. To update, you need
+# to extract the latest wyzehacks release archive to $UPDATE_DIR and name it as
+# "release_?_?_??". The updating script will search for latest version based on
+# the folder name every one minute.
+# export AUTO_UPDATE=1
+
+# By default, variable "UPDATE_DIR" is set to "/mnt/WyzeCams/wyzehacks", which
+# is <NFS_ROOT>/WyzeCams/wyzehacks. If auto update is enabled, it will search
+# for updates in this directory. The default value allows all cameras share the
+# same update. You can customize this directory for a specific camera if you
+# want it to use different update (for example, testing dev builds). Some thing
+# under "/media/mmc" would be a good candidate because it maps to the camera
+# folder.
+# export UPDATE_DIR='/media/mmc/wyzehacks'
+
+# Uncomment and update this to run a custom script after the NFS mount finishes.
+# The script must already exists and executable. You can always use "/media/mmc"
+# to refer the camera folder on the NFS share. Or use "/mnt" to refer the root
+# of NFS share. The value of the variable can only contain script file name, no
+# command line arguments. The script will be executed in background.
+# export CUSTOM_SCRIPT='/media/mmc/scripts/myscript.sh'
+# export CUSTOM_SCRIPT='/mnt/WyzeCams/scripts/myscript.sh'
+
+# !!!ADVANCED USER!!!
+# This changes the default root password to whatever you specified. To
+# generate your own password hash, use the following command from a
+# linux environment:
+#   openssl passwd -1 -salt <YOUR SALT> <YOUR PASSWORD>
+# Use the result to replace sample hash ($1$MYSALT$3Sy1OLRk4kTa7P6fvzwp71)
+# export PASSWD_SHADOW='root:$1$MYSALT$3Sy1OLRk4kTa7P6fvzwp71:10933:0:99999:7:::'

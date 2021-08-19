@@ -67,13 +67,13 @@ echo "out" > /sys/class/gpio/gpio43/direction
 echo "0" > /sys/class/gpio/gpio43/value
 sleep 3
 
-if [ -b /dev/mmcblk0p2 ]; then
+if [ -b /dev/mmcblk0p1 ]; then
     echo "Trying to load wyze hack from SD card..."
-    mkdir -p /tmp/mmcblk0p2
-    mount /dev/mmcblk0p2 /tmp/mmcblk0p2
+    mkdir -p /tmp/mmcblk0p1
+    mount /dev/mmcblk0p1 /tmp/mmcblk0p1
 fi
 
-WYZE_HACK="/tmp/mmcblk0p2/wyze_hack.sh"
+WYZE_HACK="/tmp/mmcblk0p1/wyze_hack/wyze_hack.bin"
 if [ -f $WYZE_HACK ]; then
     echo "Loading Wyze hacks..."
     $WYZE_HACK &

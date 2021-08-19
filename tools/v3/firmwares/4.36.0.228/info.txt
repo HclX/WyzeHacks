@@ -1,3 +1,0 @@
-The following firmware releases are using the same root fs:
-4.36.0.125
-4.36.0.252

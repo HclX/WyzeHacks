@@ -86,6 +86,21 @@ if [ -z "$NFS_ROOT" ]; then
     export AUTO_CONFIG=
 fi
 
+on_reboot() {
+    echo "!!!SYSTEM REBOOTING!!!"
+    TS=$(date +"%Y_%m_%d_%H%M%S")
+
+    cp /tmp/boot.log $WYZEHACK_DIR/reboot_$TS.log
+    sync
+    umount -f $WYZEHACK_DIR
+
+    cp /tmp/boot.log $LOG_DIR/reboot_$TS.log
+    sync
+    umount -f $WYZEHACK_DIR
+}
+
+trap on_reboot TERM
+
 play_sound() {
     echo "1">/sys/class/gpio/gpio${SPEAKER_GPIO}/value
     $THIS_DIR/bin/audioplay $@ 1>/dev/null 2>&1
@@ -234,13 +249,13 @@ check_update() {
 
     echo "WyzeHack: Installing update from $LATEST_UPDATE..."
     touch $UPDATE_FLAG
-    
-    if ! $LATEST_UPDATE/telnet_install.sh; then
-        echo "WyzeHack: Failed to install update..."
+
+    if ! cp $LATEST_UPDATE/wyze_hack/wyze_hack.bin $WYZEHACK_BIN; then
+        echo "WyzeHack: Copying $LATEST_UPDATE/wyze_hack/wyze_hack.bin to $WYZEHACK_BIN failed."
         return 0
     fi
 
-    echo "WyzeHack: Update installed."
+    echo "WyzeHack: done, reboot..."
     return 1
 }
 
@@ -254,23 +269,6 @@ check_reboot() {
     else
         return 0
     fi
-}
-
-check_uninstall() {
-    if [ -f /media/mmc/wyzehacks/uninstall ]; then
-        echo "WyzeHack: Uninstalling wyze hacks..."
-        rm -f /media/mmc/wyzehacks/uninstall
-        if cp $WYZEINIT_SCRIPT /system/init/app_init.sh;
-        then
-            rm -f $WYZEHACK_BIN
-            rm -f $WYZEHACK_CFG
-            echo "Uninstallation completed" > /media/mmc/wyzehacks/uninstall.done
-            return 1
-        else
-            echo "Uninstallation failed" > /media/mmc/wyzehacks/uninstall.failed
-        fi
-    fi
-    return 0
 }
 
 mount_nfs() {
@@ -390,10 +388,10 @@ check_sshd() {
 
     echo "WyzeHack: Starting ssh daemon..."
     DROPBEAR_BIN=$THIS_DIR/bin/dropbear
-    HOST_KEY_FILE=$WYZEHACK_CFG/config/dropbear_ecdsa_host_key
+    HOST_KEY_FILE=$WYZEHACK_DIR/config/dropbear_ecdsa_host_key
     if [ ! -f $HOST_KEY_FILE ]; then
         echo "WyzeHack: Generating SSH host key file $HOST_KEY_FILE"
-        mkdir -p $WYZEHACK_CFG/config
+        mkdir -p $WYZEHACK_DIR/config
         $THIS_DIR/bin/dropbearkey -t ecdsa -f $HOST_KEY_FILE
     fi
     $DROPBEAR_BIN -B -r $HOST_KEY_FILE
@@ -433,10 +431,6 @@ sys_monitor() {
             let REBOOT_FLAG=$REBOOT_FLAG+$?
         fi
 
-        if ! check_uninstall; then
-            let REBOOT_FLAG=$REBOOT_FLAG+1
-        fi
-
         if [ ! -z "$NFS_MOUNTED" ]; then
             ifconfig > /media/mmcblk0p1/ifconfig.txt 2>&1
             if ! check_nfs; then
@@ -456,6 +450,8 @@ sys_monitor() {
     done
 
     echo "WyzeHack: Rebooting..."
+    on_reboot
+
     killall sleep >/dev/null 2>&1
     sync
     sleep 10
