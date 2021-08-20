@@ -1,6 +1,6 @@
 #!/bin/sh
 
-build_root() {
+demo_patch() {
     DEMO_IN=$1
     DEMO_OUT=$2
 
@@ -19,14 +19,13 @@ build_root() {
     TMP_DIR=$(mktemp -d -t wh-XXXXXXXXXX)
     echo "Using temporary directory $TMP_DIR..."
 
-    ./packer.sh unpack $DEMO_IN $TMP_DIR
+    IN_DIR=$(dirname $DEMO_IN)
+    $IN_DIR/packer.sh unpack $DEMO_IN $TMP_DIR
 
     unsquashfs -d $TMP_DIR/rootfs $TMP_DIR/rootfs.bin >/dev/null
-    ROOTFS_VER=$(grep -i AppVer $TMP_DIR/rootfs/usr/app.ver | sed -E 's/^.*=[[:space:]]*([0-9.]+)[[:space:]]*$/\1/g')
-    echo "Root FS version is '$ROOTFS_VER'."
 
     chmod a+w $TMP_DIR/rootfs/etc/shadow
-    cp -r ./patch/* $TMP_DIR/rootfs/
+    cp -r $IN_DIR//patch/* $TMP_DIR/rootfs/
     chmod a-w $TMP_DIR/rootfs/etc/shadow
 
     touch $TMP_DIR/rootfs/etc/init.d/.wyzehacks
@@ -36,7 +35,8 @@ build_root() {
     NEW_SIZE=$(wc -c < $TMP_DIR/rootfs2.bin)
     dd if=/dev/zero bs=1 count=$(($ORIG_SIZE - $NEW_SIZE)) >> $TMP_DIR/rootfs2.bin
 
-    ./packer.sh pack $TMP_DIR $DEMO_OUT
+    $IN_DIR/packer.sh pack $TMP_DIR $DEMO_OUT
+    cp $IN_DIR/version.txt $(dirname $DEMO_OUT)/
 
     if [ -z $DEBUG ]; then
         rm -rf $TMP_DIR
@@ -46,12 +46,6 @@ build_root() {
 set -e
 CUR_DIR=$(dirname $(readlink -f $0))
 
-cd $CUR_DIR/v2
-for dir in firmwares/*/; do
-    build_root ${dir}demo.bin ${dir}demo_hack.bin
-done
-
-cd $CUR_DIR/v3
-for dir in firmwares/*/; do
-    build_root ${dir}demo_wcv3.bin ${dir}demo_wcv3_hack.bin
-done
+demo_patch $CUR_DIR/PAN/demo.bin $CUR_DIR/../installer/PAN/demo.bin
+demo_patch $CUR_DIR/V2/demo.bin $CUR_DIR/../installer/V2/demo.bin
+demo_patch $CUR_DIR/V3/demo_wcv3.bin $CUR_DIR/../installer/V3/demo_wcv3.bin
