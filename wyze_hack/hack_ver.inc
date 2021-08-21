@@ -1,1 +1,0 @@
-export WYZEHACK_VER=1.0.00

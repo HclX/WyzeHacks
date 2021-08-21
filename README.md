@@ -181,7 +181,7 @@ With wyzehacks installed, you should have the telnet access available. You can
 log into the camera and perform the following steps (for v1, v2 and PAN):
 ```
   cp /system/init/app_init_orig.sh /system/init/app_init.sh 
-  rm /params/wyze_hack.*
+  rm /params/wyzehacks.*
 ```
 Once you verified the above commands finished successfully you are no longer
 having any wyzehacks related stuff on the camera.
@@ -306,12 +306,12 @@ and run "mount" to see if you have the NFS share correctly mounted.
 3. If mount shows no NFS file system is mounted, try to mount the share manually
 with the following commands and see what error message you get:
 ```
-source /params/wyze_hack.cfg
+source /params/wyzehacks.cfg
 mount $NFS_OPTIONS $NFS_ROOT /mnt
 ```
 5. At this point you will need to figure out what's wrong with your config file,
 and try to see if you can fix it by tweaking NFS_ROOT and NFS_OPTIONS in file 
-`/params/wyze_hack.cfg`. You can edit this file over telnet with `vi` command.
+`/params/wyzehacks.cfg`. You can edit this file over telnet with `vi` command.
 
 ## I see files but no recordings on my NFS shares.
 People report this kind of behavior and it seems to be caused by NFS share with

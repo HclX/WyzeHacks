@@ -2,5 +2,5 @@
 .vscode
 release/*
 !release/*.zip
-installer/wyze_hack/wyze_hack.cfg
-installer/wyze_hack/wyze_hack.bin
+installer/wyzehacks/wyzehacks.cfg
+installer/wyzehacks/wyzehacks.bin

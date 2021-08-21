@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "Calling tf_prepare $@"
-exit 0

@@ -32,7 +32,7 @@ Now we can proceed installing the latest wyze hacks:
 above step to unlock your camera's bootloader.
 2. The latest WyzeHack requires an SD card in the camera to work. So prepare
 your SD card, and extract everything to the root directory of the card.
-3. Make a copy of wyze_hack/wyze_hack.cfg.TEMPLATE to wyze_hack/wyze_hack.cfg,
+3. Make a copy of wyzehacks/wyzehacks.cfg.TEMPLATE to wyzehacks/wyzehacks.cfg,
 and modify it accordingly based on your environment.
 4. Now depending the model of the camera you want to use with this SD card, move
 the correct demo.bin or demo_wcv3.bin to the root directory.

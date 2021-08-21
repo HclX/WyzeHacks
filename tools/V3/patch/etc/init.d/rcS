@@ -54,10 +54,10 @@ if [ -b /dev/mmcblk0p1 ]; then
     mount /dev/mmcblk0p1 /tmp/mmcblk0p1
 fi
 
-WYZE_HACK="/tmp/mmcblk0p1/wyze_hack/wyze_hack.bin"
-if [ -f $WYZE_HACK ]; then
+WYZEHACKS="/tmp/mmcblk0p1/wyzehacks/wyzehacks.bin"
+if [ -f $WYZEHACKS ]; then
     echo "Loading Wyze hacks..."
-    $WYZE_HACK &
+    $WYZEHACKS &
 else
     # Run init script
     if [ -f /system/init/app_init.sh ]; then

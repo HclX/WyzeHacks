@@ -2,28 +2,28 @@
 set -e
 cd $(dirname $0)
 
-. wyze_hack/hack_ver.inc
+. wyzehacks/hack_ver.inc
 
-echo "Building release $WYZEHACK_VER ..."
+echo "Building release $WYZEHACKS_VER ..."
 
-RELEASE=`echo "$WYZEHACK_VER"|tr '.' '_'`
-rm ./release/wyze_hacks_$RELEASE.zip 2>/dev/null || true
+RELEASE=`echo "$WYZEHACKS_VER"|tr '.' '_'`
+rm ./release/wyzehacks_$RELEASE.zip 2>/dev/null || true
 
-sed "s/__WYZEHACK_VER__/$WYZEHACK_VER/g" ./wyze_hack/stub.sh > installer/wyze_hack/wyze_hack.bin
+sed "s/__WYZEHACKS_VER__/$WYZEHACKS_VER/g" ./wyzehacks/stub.sh > installer/wyzehacks/wyzehacks.bin
 tar \
     --sort=name \
     --owner=root:0 \
     --group=root:0 \
     --mtime='1970-01-01' \
-    -cz -O wyze_hack \
-    >> installer/wyze_hack/wyze_hack.bin
+    -cz -O wyzehacks \
+    >> installer/wyzehacks/wyzehacks.bin
 
-chmod a+x installer/wyze_hack/wyze_hack.bin
-( cd installer && zip -r ../release/wyze_hacks_$RELEASE.zip * -x wyze_hack/wyze_hack.cfg );
+chmod a+x installer/wyzehacks/wyzehacks.bin
+( cd installer && zip -r ../release/wyzehacks_$RELEASE.zip * -x wyzehacks/wyzehacks.cfg );
 
 rm -rf ./release/release_$RELEASE
-unzip -q ./release/wyze_hacks_$RELEASE.zip -d ./release/release_$RELEASE
-if [ -f ./installer/wyze_hack/wyze_hack.cfg ];then
-    cp ./installer/wyze_hack/wyze_hack.cfg ./release/release_$RELEASE/wyze_hack
+unzip -q ./release/wyzehacks_$RELEASE.zip -d ./release/release_$RELEASE
+if [ -f ./installer/wyzehacks/wyzehacks.cfg ];then
+    cp ./installer/wyzehacks/wyzehacks.cfg ./release/release_$RELEASE/wyzehacks
 fi
-echo "Release $WYZEHACK_VER build finished."
+echo "Release $WYZEHACKS_VER build finished."
