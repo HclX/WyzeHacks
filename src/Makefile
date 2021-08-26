@@ -1,12 +1,21 @@
-.PHONY: driver utils clean clean_all
+.PHONY: driver utils busybox dropbear clean clean_all
 
-all: utils
+INSTALLDIR ?= .
+INSTALLDIR := $(abspath $(INSTALLDIR))
 
-driver: | .tmp/.toolchain .tmp/.kernel
+all: utils busybox dropbear
+
+driver: | .tmp/.toolchain .tmp/.kernel $(INSTALLDIR)/bin
 	make -C dummymmc CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu- KDIR=$(CURDIR)/.tmp/kernel-master
 
-utils: | .tmp/.toolchain
+utils: | .tmp/.toolchain $(INSTALLDIR)/bin
 	make -C utils CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu-
+
+busybox dropbear: | .tmp/.toolchain $(INSTALLDIR)/bin
+	cd $@ && \
+		CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu- \
+		INSTALLDIR=$(INSTALLDIR) \
+		./build.sh 
 
 clean:
 #	make -C dummymmc clean CROSS_COMPILE=$(CURDIR)/.tmp/mips-gcc472-glibc216-64bit-master/bin/mips-linux-gnu- KDIR=$(CURDIR)/.tmp/kernel-master
@@ -29,5 +38,5 @@ clean_all: |clean
 .tmp/toolchain.zip: | .tmp
 	wget -O $@ https://github.com/Dafang-Hacks/mips-gcc472-glibc216-64bit/archive/master.zip
 
-.tmp:
-	mkdir .tmp
+.tmp $(INSTALLDIR)/bin:
+	mkdir $@

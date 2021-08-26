@@ -25,7 +25,8 @@ demo_patch() {
     unsquashfs -d $TMP_DIR/rootfs $TMP_DIR/rootfs.bin >/dev/null
 
     chmod a+w $TMP_DIR/rootfs/etc/shadow
-    cp -r $IN_DIR//patch/* $TMP_DIR/rootfs/
+    cp -r patch/* $TMP_DIR/rootfs/
+    cp -r $IN_DIR/patch/* $TMP_DIR/rootfs/
     chmod a-w $TMP_DIR/rootfs/etc/shadow
 
     touch $TMP_DIR/rootfs/etc/init.d/.wyzehacks
