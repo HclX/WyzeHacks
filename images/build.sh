@@ -30,7 +30,7 @@ demo_patch() {
     chmod a-w $TMP_DIR/rootfs/etc/shadow
 
     touch $TMP_DIR/rootfs/etc/init.d/.wyzehacks
-    mksquashfs $TMP_DIR/rootfs/ $TMP_DIR/rootfs2.bin -noappend -all-root -comp xz >/dev/null
+    mksquashfs $TMP_DIR/rootfs/ $TMP_DIR/rootfs2.bin -noappend -all-root -comp xz -info
 
     ORIG_SIZE=$(wc -c < $TMP_DIR/rootfs.bin)
     NEW_SIZE=$(wc -c < $TMP_DIR/rootfs2.bin)

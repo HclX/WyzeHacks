@@ -1,5 +1,0 @@
-modules.order
-Module.symvers
-*.cmd
-.tmp_versions
-dummy_mmc.mod.c
