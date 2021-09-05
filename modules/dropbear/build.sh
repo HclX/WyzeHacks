@@ -6,14 +6,13 @@ set -x
 . ../setenv.sh
 
 export CFLAGS="${CFLAGS} -DFAKE_ROOT"
-if [ ! -d dropbear/.git ]
+if [ ! -d .src/.git ]
 then
-    git clone https://github.com/mkj/dropbear
+    git clone https://github.com/mkj/dropbear .src
 fi
-cp *.h dropbear
-cd dropbear
-echo '#define DEFAULT_PATH "/usr/bin:/bin:/system/bin:/system/sdcard/bin"' >> localoptions.h
+cp *.h .src/
 
+cd .src
 autoconf; autoheader
 ./configure --host=mips-linux --disable-zlib
 make clean

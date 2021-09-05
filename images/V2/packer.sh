@@ -10,10 +10,10 @@ if [ "$ACTION" = "unpack" ]; then
     DEMO_IN=$2
     OUT_DIR=$3
 
-    dd if=${DEMO_IN} of=$OUT_DIR/kernel.bin skip=$KERNEL_OFFSET count=$(($ROOTFS_OFFSET-$KERNEL_OFFSET)) bs=1
-    dd if=${DEMO_IN} of=$OUT_DIR/rootfs.bin skip=$ROOTFS_OFFSET count=$(($DRIVER_OFFSET-$ROOTFS_OFFSET)) bs=1
-    dd if=${DEMO_IN} of=$OUT_DIR/driver.bin skip=$DRIVER_OFFSET count=$(($APPFS_OFFSET-$DRIVER_OFFSET)) bs=1
-    dd if=${DEMO_IN} of=$OUT_DIR/appfs.bin  skip=$APPFS_OFFSET  bs=1
+    dd status=none if=${DEMO_IN} of=$OUT_DIR/kernel.bin skip=$KERNEL_OFFSET count=$(($ROOTFS_OFFSET-$KERNEL_OFFSET)) bs=1
+    dd status=none if=${DEMO_IN} of=$OUT_DIR/rootfs.bin skip=$ROOTFS_OFFSET count=$(($DRIVER_OFFSET-$ROOTFS_OFFSET)) bs=1
+    dd status=none if=${DEMO_IN} of=$OUT_DIR/driver.bin skip=$DRIVER_OFFSET count=$(($APPFS_OFFSET-$DRIVER_OFFSET)) bs=1
+    dd status=none if=${DEMO_IN} of=$OUT_DIR/appfs.bin  skip=$APPFS_OFFSET  bs=1
 elif [ "$ACTION" = "pack" ]; then
     TMP_DIR=$2
     DEMO_OUT=$3

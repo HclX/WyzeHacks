@@ -5,13 +5,11 @@ set -x
 
 . ../setenv.sh
 
-if [ ! -d busybox/.git ]
+if [ ! -d .src/.git ]
 then
-  git clone --depth=1  git://git.busybox.net/busybox
+  git clone --depth=1 git://git.busybox.net/busybox .src
 fi
 
-cd busybox
-make clean
-cp ../myconfig .config
-make CROSS_COMPILE=$CROSS_COMPILE
-cp busybox ${INSTALLDIR}/bin
+cp myconfig .src/.config
+make CROSS_COMPILE=$CROSS_COMPILE -C .src clean all
+cp .src/busybox ${INSTALLDIR}/bin

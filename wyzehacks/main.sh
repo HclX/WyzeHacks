@@ -387,15 +387,8 @@ check_sshd() {
     fi
 
     echo "WyzeHack: Starting ssh daemon..."
-    DROPBEAR_BIN=$THIS_DIR/bin/dropbear
-
-    HOST_KEY_FILE=$WYZEHACKS_DIR/.ssh/host_key
-    if [ ! -f $HOST_KEY_FILE ]; then
-        echo "WyzeHack: Generating SSH host key file $HOST_KEY_FILE"
-        mkdir -p $WYZEHACKS_DIR/.ssh
-        $THIS_DIR/bin/dropbearkey -t ecdsa -f $HOST_KEY_FILE
-    fi
-    $DROPBEAR_BIN -B -r $HOST_KEY_FILE
+    mkdir -p $WYZEHACKS_DIR/.ssh
+    dropbear -R
 }
 
 sys_monitor() {
