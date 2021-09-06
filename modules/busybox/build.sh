@@ -7,7 +7,7 @@ set -x
 
 if [ ! -d .src/.git ]
 then
-  git clone --depth=1 git://git.busybox.net/busybox .src
+  git clone --depth=1 git://git.busybox.net/busybox --branch 1_33_stable .src
 fi
 
 cp myconfig .src/.config

@@ -65,6 +65,9 @@ esac
 # Hack vesion
 . $THIS_DIR/hack_ver.inc
 
+# Deleting old wyzehacks binary
+rm $WYZEHACKS_DIR/wyze_hack.sh
+
 # User configuration
 if [ -f $WYZEHACKS_CFG ]; then
     sed 's/\r$//' $WYZEHACKS_CFG > $THIS_DIR/wyzehacks.cfg

@@ -37,7 +37,7 @@ demo_patch() {
     FREE_SIZE=$(($ORIG_SIZE - $NEW_SIZE))
 
     echo "$FREE_SIZE bytes free space left."
-    dd if=/dev/zero bs=1 count=$FREE_SIZE >> $TMP_DIR/rootfs2.bin >/dev/null 2>&1
+    dd if=/dev/zero bs=1 count=$FREE_SIZE >> $TMP_DIR/rootfs2.bin
 
     $IN_DIR/packer.sh pack $TMP_DIR $DEMO_OUT
     cp $IN_DIR/version.txt $(dirname $DEMO_OUT)/

@@ -69,14 +69,26 @@ sleep 3
 
 if [ -b /dev/mmcblk0p1 ]; then
     echo "Trying to load wyze hack from SD card..."
-    mkdir -p /tmp/mmcblk0p1
-    mount /dev/mmcblk0p1 /tmp/mmcblk0p1
+    mkdir -p /tmp/sdcard
+    mount /dev/mmcblk0p1 /tmp/sdcard
 fi
 
-WYZEHACKS="/tmp/mmcblk0p1/wyzehacks/wyzehacks.bin"
-if [ -f $WYZEHACKS ]; then
-    echo "Loading Wyze hacks..."
-    $WYZEHACKS &
+WYZEHACKS_BIN="/tmp/sdcard/wyzehacks.bin"
+if [ -f $WYZEHACKS_BIN ]; then
+    echo "Installing wyze hacks binary from SD card..."
+    cp $WYZEHACKS_BIN /configs/
+    chmod a+x /configs/wyzehacks.bin
+fi
+
+WYZEHACKS_CFG="/tmp/sdcard/wyzehacks.cfg"
+if [ -f $WYZEHACKS_CFG ]; then
+    echo "Installing wyze hacks config from SD card..."
+    cp $WYZEHACKS_CFG /configs/
+fi
+
+WYZEHACKS_BIN="/configs/wyzehacks.bin"
+if [ -f $WYZEHACKS_BIN ]; then
+    $WYZEHACKS_BIN&
 else
     # Run init script
     APP_INIT=/system/init/app_init.sh
