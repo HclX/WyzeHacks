@@ -118,10 +118,10 @@ properly.
 4. First time, it will ask your Wyze account and password, and it may also ask
 for 2FA authentication.
 5. The login credentials will be stored in a local file named ".tokens" for
-future use so you don't need to enter username and password and 2FA everytime.
+future use so you don't need to enter username and password and 2FA every time.
 Make sure you don't share this file with anyone you don't trust.
-6. The token seems to have an expiration period. So next time if you run into
-error with something like "Access token error" please delete ".tokens" file and
+6. The token seems to have an expiration period. So, next time, if you run into an
+error with something like "Access token error", please delete the ".tokens" file and
 restart.
 7. Once correctly authenticated, it will go through all the Wyze Cameras under
 your account, asking you for each of them if you want to push the wyzehack onto
@@ -172,8 +172,8 @@ You can use one of the following ways to uninstall this hack:
 Starting with version 0.5.01, you can tell the camera to uninstall wyzehacks by
 placing a file at the following location:
   `<CamDir>/wyzehacks/uninstall`
-Once the uninstallation finished, you will see a file `uninstall.done`
-confirming the success of uninstallation, or a file `uninstall.failed` telling
+Once the uninstallation finishes, you will see a file `uninstall.done`
+confirming the success of uninstallation; or a file `uninstall.failed` telling
 something went wrong with the uninstallation.
 
 ## Do a manual telnet uninstall
